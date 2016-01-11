@@ -1,6 +1,6 @@
 {
   "name": "eshost",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Run scripts in any ECMAScript host",
   "bin": {
     "eshost": "jshost.js"
@@ -11,7 +11,6 @@
     "configstore": "^1.4.0",
     "es-host-wrapper": "^1.0.0",
     "nconf": "^0.8.2",
-    "runify": "^1.0.0",
     "temp": "^0.8.3",
     "yargs": "^3.31.0"
   },
