@@ -1,9 +1,9 @@
 {
   "name": "eshost",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "Run scripts in any ECMAScript host",
   "bin": {
-    "eshost": "jshost.js"
+    "eshost": "bin/eshost.js"
   },
   "dependencies": {
     "chalk": "^1.1.1",
