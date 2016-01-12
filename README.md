@@ -6,7 +6,9 @@ ESHost makes it easy to run and compare ECMAScript code uniformly across a numbe
 
 ```
 npm install -g eshost
-eshost host add <name> <type> <path to host executable> --args <optional arguments>
+eshost --help
+eshost host --help
+eshost host --add <name> <type> <path to host executable> --args <optional arguments>
 eshost -e "print(Map.length)"
 
 ## chakra-es6
