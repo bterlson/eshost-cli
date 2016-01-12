@@ -7,8 +7,25 @@ ESHost makes it easy to run and compare ECMAScript code uniformly across a numbe
 ```
 npm install -g eshost
 eshost host add <name> <type> <path to host executable> --args <optional arguments>
-eshost -e "print(1)"
+eshost -e "print(Map.length)"
+
+## chakra-es6
+0
+
+## d8
+0
+
+## chakra
+0
+
+## spidermonkey
+1
+
+## node
+0
 ```
+
+Console hosts are either provided by the browser vendors or, more likely, built from source.
 
 Host types are those provided by es-host-wrapper, namely:
 
