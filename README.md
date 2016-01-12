@@ -1,6 +1,6 @@
 ## ESHost
 
-ESHost makes it easy to run and compare ECMAScript code uniformly across a number of runtimes. Support for runtimes is provided by the library [es-host-wrapper](https://github.com/bterlson/es-host-wrapper).
+ESHost makes it easy to run and compare ECMAScript code uniformly across a number of runtimes. Support for runtimes is provided by the library [es-host-wrapper](https://github.com/bterlson/es-host-wrapper). Every host is initialized with the [es-host-wrapper runtime API](https://github.com/bterlson/es-host-wrapper#runtime-library) available which provides a uniform way to print, create realms, and eval code. 
 
 ### Usage
 
