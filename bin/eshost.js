@@ -10,29 +10,38 @@ const config = Config.config;
 const Path = require('path');
 const chalk = require('chalk');
 
+const cmdConfigs = {
+  host: {
+    args: {
+      type: 'string',
+      requiresArg: true
+    },
+    add: {
+      alias: 'a',
+      describe: 'add a host',
+      array: true
+    },
+    list: {
+      alias: 'l',
+      describe: 'list current hosts',
+      boolean: true
+    },
+    delete: {
+      alias: 'd',
+      describe: 'remove a host',
+      boolean: true
+    }
+  }
+};
+
+const cmdLists = Object.keys(cmdConfigs).reduce((accum, cmd) => {
+  accum[cmd] = Object.keys(cmdConfigs[cmd]).sort();
+  return accum;
+}, {});
+
 function hostCommand(yargs) {
   const argv = yargs
-    .options({
-      'args': {
-        type: 'string',
-        requiresArg: true
-      },
-      'add': {
-        alias: 'a',
-        describe: 'add a host',
-        array: true
-      },
-      'list': {
-        alias: 'l',
-        describe: 'list current hosts',
-        boolean: true
-      },
-      'delete': {
-        alias: 'd',
-        describe: 'remove a host',
-        boolean: true
-      }
-    })
+    .options(cmdConfigs.host)
     .help('help')
     .argv;
 
@@ -40,7 +49,6 @@ function hostCommand(yargs) {
     var table = new Table({
       head: ['name', 'type', 'path', 'args']
     });
-
 
     Object.keys(config.hosts).forEach(name => {
       const host = config.hosts[name];
@@ -75,7 +83,7 @@ function hostCommand(yargs) {
 }
 
 const argv = yargs
-  .command('host', 'add/update/remove hosts', hostCommand)
+  .command('host', `${cmdLists.host.join('/')} hosts`, hostCommand)
   .help('help')
   .argv;
 
