@@ -93,9 +93,9 @@ function runInEachHost(code) {
 
     runner.exec(code).then(function (result) {
       printHostResult(name, result);
-      console.log("")
+      console.log("");
     });
-  })
+  });
 }
 
 function forEachHost(fn) {
@@ -106,7 +106,7 @@ function forEachHost(fn) {
 }
 
 function printHostResult(name, result) {
-  console.log(chalk.blue(`## ${name}`))
+  console.log(chalk.blue(`## ${name}`));
   console.log(result.stdout.trim());
 
   if (result.error) {
