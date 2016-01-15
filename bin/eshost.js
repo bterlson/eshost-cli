@@ -84,7 +84,10 @@ function hostCommand(yargs) {
 }
 
 const argv = yargs
+  .usage('Usage: eshost [command] [options] [input-file]')
   .command('host', `${cmdLists.host.join('/')} hosts`, hostCommand)
+  .describe('e', 'eval a string')
+  .alias('e', 'eval')
   .help('help')
   .argv;
 

@@ -6,6 +6,10 @@ See es-host-wrapper's [supported hosts](https://github.com/bterlson/es-host-wrap
 
 ### Usage
 
+Manage hosts with `eshost host`. Run files across all hosts using `eshost file.js`. Run a quick script using `eshost -e "script"`.
+
+#### Examples
+
 ```
 npm install -g eshost
 eshost --help
