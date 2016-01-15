@@ -117,7 +117,7 @@ function forEachHost(fn) {
 }
 
 function printHostResult(name, result) {
-  console.log(chalk.blue(`## ${name}`));
+  console.log(chalk.blue(`#### ${name}`));
   console.log(result.stdout.trim());
 
   if (result.error) {

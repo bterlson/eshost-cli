@@ -1,6 +1,6 @@
 {
   "name": "eshost",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Run scripts in any ECMAScript host",
   "bin": {
     "eshost": "bin/eshost.js"
