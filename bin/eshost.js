@@ -70,7 +70,7 @@ function hostCommand(yargs) {
     config.hosts[name] = { type, path, args };
     Config.save();
     console.log(`Host '${name}' added`);
-  } else if (argv.remove) {
+  } else if (argv.delete) {
     const name = argv._[1];
 
     if(config.hosts[name]) {
