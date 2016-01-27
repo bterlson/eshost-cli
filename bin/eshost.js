@@ -68,15 +68,27 @@ function hostCommand(yargs) {
     }
 
     config.hosts[name] = { type, path, args };
-    Config.save();
-    console.log(`Host '${name}' added`);
+    Config.save(function (err) {
+      if (err) {
+        console.error(err);
+        process.exit(1);
+        return;
+      }
+      console.log(`Host '${name}' added`);
+    });
   } else if (argv.delete) {
     const name = argv._[1];
 
     if(config.hosts[name]) {
       delete config.hosts[name];
-      Config.save();
-      console.log(`Host '${name}' removed`);
+      Config.save(function (err) {
+        if (err) {
+          console.error(err);
+          process.exit(1);
+          return;
+        }
+        console.log(`Host '${name}' removed`);
+      });
     } else {
       console.log(`Host '${name}' not found`);
     }
