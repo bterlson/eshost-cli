@@ -100,31 +100,36 @@ const argv = yargs
   .command('host', `${cmdLists.host.join('/')} hosts`, hostCommand)
   .describe('e', 'eval a string')
   .alias('e', 'eval')
+  .describe('H', 'select a host name to run')
+  .alias('H', 'host')
   .help('help')
   .argv;
 
+const hosts = argv.H ? [].concat(argv.H) : Object.keys(config.hosts);
+
 if (argv._[0] !== undefined && argv._[0] !== 'host') {
   const file = fs.readFileSync(argv._[0], 'utf8');
-  runInEachHost(file);
+
+  runInEachHost(file, hosts);
 } else if (argv.e) {
-  runInEachHost(argv.e);
+  runInEachHost(argv.e, hosts);
 }
 
-function runInEachHost(code) {
-  forEachHost((name, host) => {
-    var runner = esh.getRunner(host.path, host.type, host.args);
+function runInHost(host, code) {
+  const runner = esh.getRunner(host.path, host.type, host.args);
 
-    runner.exec(code).then(function (result) {
-      printHostResult(name, result);
-      console.log("");
-    });
+  runner.exec(code).then(function (result) {
+    printHostResult(host.name, result);
+    console.log("");
   });
 }
 
-function forEachHost(fn) {
-  Object.keys(config.hosts).forEach(name => {
+function runInEachHost(code, hosts) {
+  hosts.forEach(name => {
     const host = config.hosts[name];
-    fn(name, host);
+    host.name = name;
+
+    runInHost(host, code);
   });
 }
 
