@@ -1,6 +1,6 @@
 {
-  "name": "eshost",
-  "version": "1.1.3",
+  "name": "eshost-cli",
+  "version": "2.0.0",
   "description": "Run scripts in any ECMAScript host",
   "bin": {
     "eshost": "bin/eshost.js"
@@ -9,7 +9,7 @@
     "chalk": "^1.1.1",
     "cli-table": "^0.3.1",
     "configstore": "^1.4.0",
-    "es-host-wrapper": "^1.2.0",
+    "eshost": "2.0.0",
     "nconf": "^0.8.2",
     "temp": "^0.8.3",
     "yargs": "^3.31.0"
@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/bterlson/eshost"
+    "url": "https://github.com/bterlson/eshost-cli"
   },
   "keywords": [
     "javascript",
@@ -32,5 +32,5 @@
   "bugs": {
     "url": "https://github.com/bterlson/eshost/issues"
   },
-  "homepage": "https://github.com/bterlson/eshost"
+  "homepage": "https://github.com/bterlson/eshost-cli"
 }
