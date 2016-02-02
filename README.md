@@ -1,8 +1,8 @@
-## ESHost
+## eshost-cli
 
-ESHost makes it easy to run and compare ECMAScript code uniformly across a number of runtimes. Support for runtimes is provided by the library [es-host-wrapper](https://github.com/bterlson/es-host-wrapper). Every host is initialized with the [es-host-wrapper runtime API](https://github.com/bterlson/es-host-wrapper#runtime-library) available which provides a uniform way to print, create realms, and eval code. 
+eshost-cli makes it easy to run and compare ECMAScript code uniformly across a number of runtimes. Support for runtimes is provided by the library [eshost](https://github.com/bterlson/eshost). Every host is initialized with the [eshost runtime API](https://github.com/bterlson/eshost#runtime-library) available which provides a uniform way to print, create realms, and eval code. 
 
-See es-host-wrapper's [supported hosts](https://github.com/bterlson/es-host-wrapper#supported-hosts) for a list of hosts, download/build locations, and other information.
+See eshost's [supported hosts](https://github.com/bterlson/eshost#supported-hosts) for a list of hosts, download/build locations, and other information.
 
 ### Usage
 
@@ -11,7 +11,7 @@ Manage hosts with `eshost host`. Run files across all hosts using `eshost file.j
 #### Examples
 
 ```
-npm install -g eshost
+npm install -g eshost-cli
 eshost --help
 eshost host --help
 eshost host --add <name> <type> <path to host executable> --args <optional arguments>
