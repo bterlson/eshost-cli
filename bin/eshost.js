@@ -2,117 +2,44 @@
 "use strict";
 
 const fs = require('fs');
-const esh = require('es-host-wrapper');
+const esh = require('eshost');
 const yargs = require('yargs');
-const Table = require('cli-table')
 const Config = require('../lib/config.js')
 const config = Config.config;
 const Path = require('path');
 const chalk = require('chalk');
+const hostManager = require('../lib/host-manager.js') ;
 
-const cmdConfigs = {
-  host: {
-    args: {
-      type: 'string',
-      requiresArg: true
-    },
-    add: {
-      alias: 'a',
-      describe: 'add a host',
-      array: true
-    },
-    list: {
-      alias: 'l',
-      describe: 'list current hosts',
-      boolean: true
-    },
-    delete: {
-      alias: 'd',
-      describe: 'remove a host',
-      boolean: true
-    }
-  }
-};
-
-const cmdLists = Object.keys(cmdConfigs).reduce((accum, cmd) => {
-  accum[cmd] = Object.keys(cmdConfigs[cmd]).sort();
-  return accum;
-}, {});
-
-function hostCommand(yargs) {
-  const argv = yargs
-    .options(cmdConfigs.host)
-    .help('help')
-    .argv;
-
-  if (argv.list) {
-    var table = new Table({
-      head: ['name', 'type', 'path', 'args']
-    });
-
-    Object.keys(config.hosts).forEach(name => {
-      const host = config.hosts[name];
-      table.push([name, host.type, host.path, host.args || ""]);
-    })
-
-    console.log(table.toString());
-  } else if (argv.add) {
-    const name = argv.add[0];
-    const type = argv.add[1];
-    let path = argv.add[2];
-    let args = argv.args || "";
-    args = args.trim();
-
-    if(!Path.isAbsolute(path)) {
-      path = Path.join(process.cwd(), path);
-    }
-
-    config.hosts[name] = { type, path, args };
-    Config.save(function (err) {
-      if (err) {
-        console.error(err);
-        process.exit(1);
-        return;
-      }
-      console.log(`Host '${name}' added`);
-    });
-  } else if (argv.delete) {
-    const name = argv._[1];
-
-    if(config.hosts[name]) {
-      delete config.hosts[name];
-      Config.save(function (err) {
-        if (err) {
-          console.error(err);
-          process.exit(1);
-          return;
-        }
-        console.log(`Host '${name}' removed`);
-      });
-    } else {
-      console.log(`Host '${name}' not found`);
-    }
-  }
-}
-
-const argv = yargs
+const yargv = yargs
   .usage('Usage: eshost [command] [options] [input-file]')
-  .command('host', `${cmdLists.host.join('/')} hosts`, hostCommand)
+  .command('host', hostManager.helpText, hostManager.command)
   .describe('e', 'eval a string')
   .alias('e', 'eval')
-  .describe('H', 'select a host name to run')
-  .alias('H', 'host')
+  .describe('h', 'select hosts by name')
+  .alias('h', 'host')
+  .nargs('h', 1)
   .help('help')
-  .argv;
+  .example('eshost host list')
+  .example('eshost host add d8 d8 path/to/d8')
+  .example('eshost test.js')
+  .example('eshost -e "1+1"')
+  .example('eshost -h d8 -h chakra test.js')
 
-const hosts = argv.H ? [].concat(argv.H) : Object.keys(config.hosts);
+const argv = yargv.argv;
+const hosts = argv.n ? [].concat(argv.n) : Object.keys(config.hosts);
 
-if (argv._[0] !== undefined && argv._[0] !== 'host') {
-  const file = fs.readFileSync(argv._[0], 'utf8');
+const command = argv._[0] === 'host' ? 'host' : null;
+const file = !command ? argv._[0] : null;
+const evalString = argv.e;
 
-  runInEachHost(file, hosts);
+if (file) {
+  const contents = fs.readFileSync(file, 'utf8');
+  runInEachHost(contents, hosts);
 } else if (argv.e) {
-  runInEachHost(argv.e, hosts);
+  runInEachHost(`print(${argv.e})`, hosts);
+} else if (!command) {
+  yargv.showHelp();
+  process.exit(1);
 }
 
 function runInHost(host, code) {

@@ -15,7 +15,7 @@ npm install -g eshost
 eshost --help
 eshost host --help
 eshost host --add <name> <type> <path to host executable> --args <optional arguments>
-eshost -e "print(Map.length)"
+eshost -e "Map.length"
 
 ## chakra-es6
 0
