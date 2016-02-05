@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-"use strict";
+'use strict';
 
 const fs = require('fs');
 const esh = require('eshost');
@@ -47,7 +47,7 @@ function runInHost(host, code) {
 
   runner.exec(code).then(function (result) {
     printHostResult(host.name, result);
-    console.log("");
+    console.log('');
   });
 }
 
