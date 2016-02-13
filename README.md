@@ -39,7 +39,7 @@ The command `host` is used for managing hosts (see above for some examples). You
 
 Console hosts are either provided by the browser vendors or, more likely, built from source.
 
-Host types are [those provided by es-host-wrapper](https://github.com/bterlson/es-host-wrapper#supported-hosts), namely:
+Host types are [those provided by eshost](https://github.com/bterlson/eshost#supported-hosts), namely:
 
 * ch
 * jsshell
