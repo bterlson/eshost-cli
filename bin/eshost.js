@@ -32,6 +32,9 @@ const command = argv._[0] === 'host' ? 'host' : null;
 const file = !command ? argv._[0] : null;
 const evalString = argv.e;
 
+process.stdin.on('end', function () {
+  console.log('no stdin');
+})
 if (file) {
   const contents = fs.readFileSync(file, 'utf8');
   runInEachHost(contents, hosts);
@@ -43,12 +46,13 @@ if (file) {
 }
 
 function runInHost(host, code) {
-  const runner = esh.getRunner(host.path, host.type, host.args);
-
-  runner.exec(code).then(function (result) {
-    printHostResult(host.name, result);
-    console.log('');
-  });
+  esh.createAgent(host.type, { hostArguments: host.args, hostPath: host.path }).then(runner => {
+    runner.evalScript(code).then(function (result) {
+      printHostResult(host.name, result);
+    });
+  }).catch(e => {
+    console.error('Failure attempting to eval script in agent: ', e);
+  })
 }
 
 function runInEachHost(code, hosts) {
@@ -67,4 +71,5 @@ function printHostResult(name, result) {
   if (result.error) {
     console.log(chalk.red(`${result.error.name}: ${result.error.message}`));
   }
+  console.log("");
 }
