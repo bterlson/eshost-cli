@@ -32,19 +32,32 @@ const command = argv._[0] === 'host' ? 'host' : null;
 const file = !command ? argv._[0] : null;
 const evalString = argv.e;
 
-process.stdin.on('end', function () {
-  console.log('no stdin');
-})
+process.stdin.setEncoding('utf8');
+
 if (file) {
   const contents = fs.readFileSync(file, 'utf8');
   runInEachHost(contents, hosts);
 } else if (argv.e) {
   runInEachHost(`print(${argv.e})`, hosts);
-} else if (!command) {
-  yargv.showHelp();
-  process.exit(1);
-}
+} else if(!command) {
+  let script = '';
 
+  // check for stdin
+  process.stdin.on('readable', function() {
+    const chunk = process.stdin.read();
+
+    if (chunk === null && script === '') {
+      yargv.showHelp();
+      process.exit(1);
+    } else if (chunk !== null) {
+      script += chunk;
+    }
+  });
+
+  process.stdin.on('end', function () {
+    runInEachHost(script, hosts);
+  });
+}
 function runInHost(host, code) {
   esh.createAgent(host.type, { hostArguments: host.args, hostPath: host.path }).then(runner => {
     runner.evalScript(code).then(function (result) {
