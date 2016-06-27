@@ -18,15 +18,25 @@ const yargv = yargs
   .describe('h', 'select hosts by name')
   .alias('h', 'host')
   .nargs('h', 1)
+  .boolean('async', 'wait for realm destruction before reporting results')
+  .alias('a', 'async')
   .help('help')
   .example('eshost host list')
-  .example('eshost host add d8 d8 path/to/d8')
+  .example('eshost host --add d8 d8 path/to/d8')
   .example('eshost test.js')
   .example('eshost -e "1+1"')
   .example('eshost -h d8 -h chakra test.js')
 
 const argv = yargv.argv;
-const hosts = argv.n ? [].concat(argv.n) : Object.keys(config.hosts);
+
+let hosts;
+if (Array.isArray(argv.h)) {
+  hosts = argv.h;
+} else if (typeof argv.h === 'string') {
+  hosts = argv.h.split(',');
+} else {
+  hosts = Object.keys(config.hosts);
+}
 
 const command = argv._[0] === 'host' ? 'host' : null;
 const file = !command ? argv._[0] : null;
@@ -59,12 +69,19 @@ if (file) {
   });
 }
 function runInHost(host, code) {
-  esh.createAgent(host.type, { hostArguments: host.args, hostPath: host.path }).then(runner => {
-    runner.evalScript(code).then(function (result) {
-      printHostResult(host.name, result);
-    });
-  }).catch(e => {
-    console.error('Failure attempting to eval script in agent: ', e);
+  let runner;
+  esh.createAgent(host.type, { hostArguments: host.args, hostPath: host.path })
+  .then(r => {
+    runner = r;
+    return runner.evalScript(code, { async: argv.async });
+  })
+  .then(function (result) {
+    printHostResult(host.name, result);
+
+    return runner.destroy();
+  })
+  .catch(e => {
+    console.error(chalk.red('Failure attempting to eval script in agent: ' + e.message));
   })
 }
 
