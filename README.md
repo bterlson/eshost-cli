@@ -6,15 +6,18 @@ See eshost's [supported hosts](https://github.com/bterlson/eshost#supported-host
 
 ### Usage
 
-Manage hosts with `eshost host`. Run files across all hosts using `eshost file.js`. Run a quick script using `eshost -e "script"`.
+See --help output for the full details. Basic usage:
+
+* Add hosts using `eshost --add <host name> <host type> <host path> --args <optional arguments>`.
+* Eval an expression using `eshost -e [1,2,3].length`.
+* Execute a script using `eshost path/to/script.js`.
 
 #### Examples
 
 ```
 npm install -g eshost-cli
 eshost --help
-eshost host --help
-eshost host --add <name> <type> <path to host executable> --args <optional arguments>
+eshost --add <name> <type> <path to host executable> --args <optional arguments>
 eshost -e "Map.length"
 
 ## chakra-es6
@@ -35,7 +38,7 @@ eshost -e "Map.length"
 
 ### Managing Hosts
 
-The command `host` is used for managing hosts (see above for some examples). You can --add, --list, and --delete them. Adding a host requires a name, type, and path to the runtime executable. You can optionally pass arguments using --args. The same host can be added multiple times with different --args which makes it easy to compare the output of runtimes given different options (eg. by turning language features on and off).
+You can --add, --list, and --delete hosts. Adding a host requires a name, type, and path to the runtime executable. You can optionally pass arguments using --args. The same host can be added multiple times with different --args which makes it easy to compare the output of runtimes given different options (eg. by turning language features on and off).
 
 Console hosts are either provided by the browser vendors or, more likely, built from source.
 
@@ -47,4 +50,7 @@ Host types are [those provided by eshost](https://github.com/bterlson/eshost#sup
 * jsc
 * nashorn
 * node
-* browser
+* chrome
+* firefox
+* safari
+* edge
