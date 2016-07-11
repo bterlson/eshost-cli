@@ -5,29 +5,60 @@ const fs = require('fs');
 const esh = require('eshost');
 const yargs = require('yargs');
 const Config = require('../lib/config.js')
-const config = Config.config;
 const Path = require('path');
 const chalk = require('chalk');
 const hostManager = require('../lib/host-manager.js') ;
 
+const usage = `
+Usage: eshost [options] [input-file]
+       eshost --list
+       eshost --add [host name] [host type] <host path> <host arguments>
+       eshost --delete [host name]
+`.trim();
+
 const yargv = yargs
-  .usage('Usage: eshost [command] [options] [input-file]')
-  .command('host', hostManager.helpText, hostManager.command)
+  .strict()
+  .usage(usage)
   .describe('e', 'eval a string')
   .alias('e', 'eval')
   .describe('h', 'select hosts by name')
   .alias('h', 'host')
+  .describe('c', 'select a config file')
+  .alias('c', 'config')
   .nargs('h', 1)
   .boolean('async', 'wait for realm destruction before reporting results')
   .alias('a', 'async')
+  .boolean('l', 'list hosts')
+  .alias('l', 'list')
+  .describe('add', 'add a host')
+  .nargs('add', 2)
+  .describe('delete', 'delete a host')
+  .nargs('delete', 1)
+  .describe('args', 'set arguments for a host entry')
+  .nargs('args', 1)
   .help('help')
-  .example('eshost host list')
-  .example('eshost host --add d8 d8 path/to/d8')
+  .example('eshost --list')
+  .example('eshost --add d8 d8 path/to/d8 --args "--harmony"')
   .example('eshost test.js')
   .example('eshost -e "1+1"')
   .example('eshost -h d8 -h chakra test.js')
+  .fail(function (msg, err) {
+    if (err) {
+      console.error(err.stack);
+    } else {
+      console.error(msg);
+    }
+    process.exit(1);
+  });
 
 const argv = yargv.argv;
+
+let config;
+if (argv.c) {
+  config = new Config(argv.c);
+} else {
+  config = Config.defaultConfig();
+}
 
 let hosts;
 if (Array.isArray(argv.h)) {
@@ -38,8 +69,32 @@ if (Array.isArray(argv.h)) {
   hosts = Object.keys(config.hosts);
 }
 
-const command = argv._[0] === 'host' ? 'host' : null;
-const file = !command ? argv._[0] : null;
+// list available hosts
+if (argv.list) {
+  hostManager.list(config);
+  process.exit(0);
+}
+
+// add a host
+if (argv.add) {
+  hostManager.add(config, argv.add[0], argv.add[1], argv._[0], argv.args);
+  console.log(`Host '${argv.add[0]}' added`);
+  process.exit(0);
+} else {
+  if (argv.args) {
+    console.error('Use --args with --add');
+    process.exit(1);
+  }
+}
+
+// delete a host
+if (argv.delete) {
+  hostManager.delete(config, argv.delete);
+  console.log(`Host '${argv.delete}' deleted`);
+  process.exit(0);
+}
+
+const file = argv._[0];
 const evalString = argv.e;
 
 process.stdin.setEncoding('utf8');
@@ -49,7 +104,7 @@ if (file) {
   runInEachHost(contents, hosts);
 } else if (argv.e) {
   runInEachHost(`print(${argv.e})`, hosts);
-} else if(!command) {
+} else {
   let script = '';
 
   // check for stdin
@@ -68,6 +123,7 @@ if (file) {
     runInEachHost(script, hosts);
   });
 }
+
 function runInHost(host, code) {
   let runner;
   esh.createAgent(host.type, { hostArguments: host.args, hostPath: host.path })
