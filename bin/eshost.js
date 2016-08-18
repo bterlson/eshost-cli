@@ -8,6 +8,9 @@ const Config = require('../lib/config.js')
 const Path = require('path');
 const chalk = require('chalk');
 const hostManager = require('../lib/host-manager.js') ;
+const Table = require('cli-table');
+const DefaultReporter = require('../lib/reporters/default.js');
+const TableReporter = require('../lib/reporters/table.js');
 
 const usage = `
 Usage: eshost [options] [input-file]
@@ -25,8 +28,16 @@ const yargv = yargs
   .alias('h', 'host')
   .describe('c', 'select a config file')
   .alias('c', 'config')
+  .describe('table', 'output in a table')
+  .boolean('table')
+  .alias('table', 't')
+  .describe('coalesce', 'coalesce like output into a single entry')
+  .boolean('coalesce')
+  .describe('showSource', 'show input source')
+  .boolean('showSource')
   .nargs('h', 1)
-  .boolean('async', 'wait for realm destruction before reporting results')
+  .describe('async', 'wait for realm destruction before reporting results')
+  .boolean('async')
   .alias('a', 'async')
   .boolean('l', 'list hosts')
   .alias('l', 'list')
@@ -67,6 +78,21 @@ if (Array.isArray(argv.h)) {
   hosts = argv.h.split(',');
 } else {
   hosts = Object.keys(config.hosts);
+}
+
+let reporterOptions = {
+  showSource: argv.showSource,
+  coalesce: argv.coalesce
+};
+if (argv.showSource) {
+  reporterOptions.showSource = true;
+}
+
+let reporter;
+if (argv.table) {
+  reporter = new TableReporter(reporterOptions);
+} else {
+  reporter = new DefaultReporter(reporterOptions);
 }
 
 // list available hosts
@@ -126,36 +152,28 @@ if (file) {
 
 function runInHost(host, code) {
   let runner;
-  esh.createAgent(host.type, { hostArguments: host.args, hostPath: host.path })
+  return esh.createAgent(host.type, { hostArguments: host.args, hostPath: host.path })
   .then(r => {
     runner = r;
     return runner.evalScript(code, { async: argv.async });
   })
   .then(function (result) {
-    printHostResult(host.name, result);
-
+    reporter.result(host, result);
     return runner.destroy();
   })
   .catch(e => {
-    console.error(chalk.red('Failure attempting to eval script in agent: ' + e.message));
+    console.error(chalk.red('Failure attempting to eval script in agent: ' + e.stack));
   })
 }
 
 function runInEachHost(code, hosts) {
-  hosts.forEach(name => {
+  reporter.start(code);
+  let promises = hosts.map(name => {
     const host = config.hosts[name];
     host.name = name;
 
-    runInHost(host, code);
+    return runInHost(host, code);
   });
-}
 
-function printHostResult(name, result) {
-  console.log(chalk.blue(`#### ${name}`));
-  console.log(result.stdout.trim());
-
-  if (result.error) {
-    console.log(chalk.red(`${result.error.name}: ${result.error.message}`));
-  }
-  console.log("");
+  Promise.all(promises).then(() => reporter.end());
 }
