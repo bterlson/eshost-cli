@@ -35,6 +35,7 @@ const yargv = yargs
   .boolean('coalesce')
   .describe('showSource', 'show input source')
   .boolean('showSource')
+  .alias('showSource', 'i')
   .nargs('h', 1)
   .describe('async', 'wait for realm destruction before reporting results')
   .boolean('async')
