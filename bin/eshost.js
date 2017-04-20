@@ -33,6 +33,7 @@ const yargv = yargs
   .alias('table', 't')
   .describe('coalesce', 'coalesce like output into a single entry')
   .boolean('coalesce')
+  .alias('coalesce', 's')
   .describe('showSource', 'show input source')
   .boolean('showSource')
   .nargs('h', 1)
