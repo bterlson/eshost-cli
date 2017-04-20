@@ -79,6 +79,11 @@ if (argv.c) {
 }
 
 let hosts = [];
+if (Array.isArray(argv.h)) {
+  hosts = argv.h;
+} else if (typeof argv.h === 'string') {
+  hosts = argv.h.split(',');
+}
 
 let hostGroups;
 if (Array.isArray(argv.g)) {
@@ -91,17 +96,11 @@ if (hostGroups) {
   for (let group of hostGroups) {
     for (let hostName of Object.keys(config.hosts)) {
       let hostType = config.hosts[hostName].type;
-      if (group === hostType) {
+      if (group === hostType && !hosts.includes(hostName)) {
         hosts.push(hostName);
       }
     }
   }
-}
-
-if (Array.isArray(argv.h)) {
-  hosts = hosts.concat(argv.h);
-} else if (typeof argv.h === 'string') {
-  hosts = hosts.concat(argv.h.split(','));
 }
 
 // if hosts is still empty, get all hosts from config
