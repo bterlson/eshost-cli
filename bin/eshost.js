@@ -14,6 +14,7 @@ const TableReporter = require('../lib/reporters/table.js');
 
 const usage = `
 Usage: eshost [options] [input-file]
+       eshost [options] -e "input-script"
        eshost --list
        eshost --add [host name] [host type] <host path> <host arguments>
        eshost --delete [host name]
@@ -26,6 +27,9 @@ const yargv = yargs
   .alias('e', 'eval')
   .describe('h', 'select hosts by name')
   .alias('h', 'host')
+  .describe('g', 'select host groups by host type')
+  .alias('g', 'hostGroup')
+  .nargs('g', 1)
   .describe('c', 'select a config file')
   .alias('c', 'config')
   .describe('table', 'output in a table')
@@ -55,6 +59,9 @@ const yargv = yargs
   .example('eshost test.js')
   .example('eshost -e "1+1"')
   .example('eshost -h d8 -h chakra test.js')
+  .example('eshost -h d8,sm test.js')
+  .example('eshost -g node,ch test.js')
+  .example('eshost -h d8 -g node test.js')
   .fail(function (msg, err) {
     if (err) {
       console.error(err.stack);
@@ -73,12 +80,33 @@ if (argv.c) {
   config = Config.defaultConfig();
 }
 
-let hosts;
+let hosts = [];
 if (Array.isArray(argv.h)) {
   hosts = argv.h;
 } else if (typeof argv.h === 'string') {
   hosts = argv.h.split(',');
-} else {
+}
+
+let hostGroups;
+if (Array.isArray(argv.g)) {
+  hostGroups = argv.g;
+} else if (typeof argv.g === 'string') {
+  hostGroups = argv.g.split(',');
+}
+
+if (hostGroups) {
+  for (let group of hostGroups) {
+    for (let hostName of Object.keys(config.hosts)) {
+      let hostType = config.hosts[hostName].type;
+      if (group === hostType && !hosts.includes(hostName)) {
+        hosts.push(hostName);
+      }
+    }
+  }
+}
+
+// if hosts is still empty, get all hosts from config
+if (hosts.length === 0) {
   hosts = Object.keys(config.hosts);
 }
 
