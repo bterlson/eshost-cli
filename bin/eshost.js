@@ -93,8 +93,12 @@ if (Array.isArray(argv.h)) {
 // Add host glob matches to hosts
 let newHosts = [];
 for (let host of hosts) {
-  if (host.indexOf('*') >= 0) {
-    let re = host.replace('*','.*');
+  if (host.indexOf('*') >= 0 || host.indexOf('?') >= 0) {
+    let re = '^' + host
+      .replace(/\./g, '\\.') // escape . with /\./
+      .replace(/\*/g, '.*')  // change * to /.*/ for matches
+      .replace(/\?/g, '.')   // change ? to /./ for matches
+      + '$';
     let matcher = new RegExp(re);
     for (let hostName of Object.keys(config.hosts)) {
       if (matcher.test(hostName)) {
