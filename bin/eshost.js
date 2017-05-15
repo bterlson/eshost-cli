@@ -90,6 +90,23 @@ if (Array.isArray(argv.h)) {
   hosts = argv.h.split(',');
 }
 
+// Add host glob matches to hosts
+let newHosts = [];
+for (let host of hosts) {
+  if (host.indexOf('*') >= 0) {
+    let re = host.replace('*','.*');
+    let matcher = new RegExp(re);
+    for (let hostName of Object.keys(config.hosts)) {
+      if (matcher.test(hostName)) {
+        newHosts.push(hostName);
+      }
+    }
+  } else {
+    newHosts.push(host);
+  }
+  hosts = newHosts;
+}
+
 let hostGroups;
 if (Array.isArray(argv.g)) {
   hostGroups = argv.g;
