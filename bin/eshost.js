@@ -23,8 +23,10 @@ Usage: eshost [options] [input-file]
 const yargv = yargs
   .strict()
   .usage(usage)
-  .describe('e', 'eval a string')
+  .describe('e', 'eval an expression and print the result')
   .alias('e', 'eval')
+  .describe('x', 'execute a multi-statement program')
+  .alias('x', 'execute')
   .describe('h', 'select hosts by name')
   .alias('h', 'host')
   .describe('g', 'select host groups by host type')
@@ -151,7 +153,6 @@ if (argv.delete) {
 }
 
 const file = argv._[0];
-const evalString = argv.e;
 
 process.stdin.setEncoding('utf8');
 
@@ -160,6 +161,8 @@ if (file) {
   runInEachHost(contents, hosts);
 } else if (argv.e) {
   runInEachHost(`print(${argv.e})`, hosts);
+} else if (argv.x) {
+  runInEachHost(argv.x, hosts);
 } else {
   let script = '';
 
