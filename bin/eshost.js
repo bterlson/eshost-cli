@@ -16,7 +16,7 @@ const usage = `
 Usage: eshost [options] [input-file]
        eshost [options] -e "input-script"
        eshost --list
-       eshost --add [host name] [host type] <host path> <host arguments>
+       eshost --add [host name] [host type] <host path> --args <host arguments>
        eshost --delete [host name]
 `.trim();
 
@@ -53,13 +53,14 @@ const yargv = yargs
   .nargs('add', 2)
   .describe('delete', 'delete a host')
   .nargs('delete', 1)
-  .describe('args', 'set arguments for a host entry')
+  .describe('args', 'set arguments for a host entry (use with --add)')
   .nargs('args', 1)
   .help('help')
   .example('eshost --list')
   .example('eshost --add d8 d8 path/to/d8 --args "--harmony"')
   .example('eshost test.js')
   .example('eshost -e "1+1"')
+  .example('eshost -its -x "for (let i=0; i<10; ++i) { print(i) }"')
   .example('eshost -h d8 -h chakra test.js')
   .example('eshost -h d8,sm test.js')
   .example('eshost -g node,ch test.js')
