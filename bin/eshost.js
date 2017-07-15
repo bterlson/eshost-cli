@@ -27,7 +27,7 @@ const yargv = yargs
   .alias('e', 'eval')
   .describe('x', 'execute a multi-statement program')
   .alias('x', 'execute')
-  .describe('h', 'select hosts by name')
+  .describe('h', 'select hosts by name (glob syntax is supported as well)')
   .alias('h', 'host')
   .describe('g', 'select host groups by host type')
   .alias('g', 'hostGroup')
@@ -65,6 +65,8 @@ const yargv = yargs
   .example('eshost -h d8,sm test.js')
   .example('eshost -g node,ch test.js')
   .example('eshost -h d8 -g node test.js')
+  .example('eshost -h ch-*,node test.js')
+  .example('eshost -h ch-1.?.? test.js')
   .fail(function (msg, err) {
     if (err) {
       console.error(err.stack);
