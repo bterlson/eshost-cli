@@ -32,6 +32,8 @@ const yargv = yargs
   .describe('g', 'select host groups by host type')
   .alias('g', 'hostGroup')
   .nargs('g', 1)
+  .describe('tags', 'select hosts by tag')
+  .nargs('tags', 1)
   .describe('c', 'select a config file')
   .alias('c', 'config')
   .describe('table', 'output in a table')
@@ -127,6 +129,32 @@ if (hostGroups) {
       if (group === hostType && !hosts.includes(hostName)) {
         hosts.push(hostName);
       }
+    }
+  }
+}
+
+let hostTags;
+if (Array.isArray(argv.tags)) {
+  hostTags = argv.tags;
+} else if (typeof argv.tags === 'string') {
+  hostTags = argv.tags;
+}
+
+if (hostTags) {
+  function includesAnyOf(a, b) {
+    // console.log(`${a} includesAnyOf ${b}`); // TODO (dilijev) remove
+    for (let x of a) {
+      if (b.includes(x)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  for (let hostName of Object.keys(config.hosts)) {
+    let tags = config.hosts[hostName].tags;
+    if (tags && includesAnyOf(tags, hostTags)) {
+      hosts.push(hostName);
     }
   }
 }
