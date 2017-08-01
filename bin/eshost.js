@@ -137,7 +137,7 @@ let hostTags;
 if (Array.isArray(argv.tags)) {
   hostTags = argv.tags;
 } else if (typeof argv.tags === 'string') {
-  hostTags = argv.tags;
+  hostTags = argv.tags.split(',');
 }
 
 if (hostTags) {
@@ -187,7 +187,7 @@ if (argv.list) {
 
 // add a host
 if (argv.add) {
-  hostManager.add(config, argv.add[0], argv.add[1], argv._[0], argv.args);
+  hostManager.add(config, argv.add[0], argv.add[1], argv._[0], argv.args, hostTags);
   console.log(`Host '${argv.add[0]}' added`);
   process.exit(0);
 } else {
