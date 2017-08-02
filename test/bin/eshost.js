@@ -132,8 +132,9 @@ describe('eshost --list', () => {
       /*
       │ js   │ jsshell │ /path/to/js │      │      │
       */
-      assert.ok(result.stdout.includes(' js '));
-      assert.ok(result.stdout.includes('jsshell'));
+      assert.ok(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert.ok(/\bjs\b/m.test(result.stdout));
+      assert.ok(/\bjsshell\b/m.test(result.stdout));
       assert.ok(result.stdout.includes(toHostPath('js')));
     });
   });
@@ -159,10 +160,11 @@ describe('eshost --list', () => {
       ├──────┼─────────┼─────────────┼──────┼──────┤
       │ ch   │ ch      │ /path/to/ch │      │      │
       */
-      assert.ok(result.stdout.includes(' js '));
-      assert.ok(result.stdout.includes('jsshell'));
+      assert.ok(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert.ok(/\bjs\b/m.test(result.stdout));
+      assert.ok(/\bjsshell\b/m.test(result.stdout));
       assert.ok(result.stdout.includes(toHostPath('js')));
-      assert.ok(result.stdout.includes(' ch '));
+      assert.ok(/\bch\b/m.test(result.stdout));
       assert.ok(result.stdout.includes(toHostPath('ch')));
     });
   });
@@ -182,38 +184,32 @@ describe('eshost --add', () => {
     emptyHostConfig()
     return eshost('--add ch ch /path/to/ch').then(result => {
       assert.equal(result.stderr, '');
-      assert.deepEqual(toLines(result.stdout), [
-        `Using config  ${Config.defaultConfigPath}`,
-        `Host 'ch' added`,
-      ]);
+      assert.ok(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert.ok(result.stdout.includes('Host \'ch\' added'));
     });
   });
 
   it('disallows adding an invalid host', () => {
     return eshost('--add invalid invalid /path/to/invalid').then(result => {
-      let lines = toLines(result.stdout);
       assert.equal(result.stderr, '');
-      assert.equal(lines[0], `Using config  ${Config.defaultConfigPath}`);
-      assert.equal(lines[1].includes('Host type \'invalid\' not supported'), true);
+      assert.ok(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert.ok(result.stdout.includes('Host type \'invalid\' not supported'));
     });
   });
 
   it('allows adding a valid host with --args', () => {
     let add = '--add ch ch /path/to/ch --args "-Intl-"';
     return eshost(add).then(result => {
-      let lines = toLines(result.stdout);
       assert.equal(result.stderr, '');
 
-      if (lines[1].includes('added')) {
+      if (result.stdout.includes('Host \'ch\' added')) {
         return eshost('--list').then(result => {
           assert.equal(result.stderr, '');
-
-          let lines = toLines(result.stdout);
           /*
           │ ch   │ ch   │ /path/to/ch │ -Intl- │      │
            */
-          assert.ok(lines[4].includes('-Intl-'));
-      });
+          assert.ok(/-Intl-/m.test(result.stdout));
+        });
       } else {
         return Promise.reject(`'${add}' failed`);
       }
@@ -223,19 +219,16 @@ describe('eshost --add', () => {
   it('allows adding a valid host with --tags (1)', () => {
     let add = '--add ch ch /path/to/ch --tags latest';
     return eshost(add).then(result => {
-      let lines = toLines(result.stdout);
       assert.equal(result.stderr, '');
 
-      if (lines[1].includes('added')) {
+      if (result.stdout.includes('Host \'ch\' added')) {
         return eshost('--list').then(result => {
           assert.equal(result.stderr, '');
-
-          let lines = toLines(result.stdout);
           /*
           │ ch   │ ch   │ /usr/local/bin/ch │      │ latest │
            */
-          assert.ok(lines[4].includes('best'));
-      });
+          assert.ok(/\blatest\b/m.test(result.stdout));
+        });
       } else {
         return Promise.reject(`'${add}' failed`);
       }
@@ -283,10 +276,8 @@ describe('eshost --delete', () => {
 
     return eshost('--delete ch').then(result => {
       assert.equal(result.stderr, '');
-      assert.deepEqual(toLines(result.stdout), [
-        `Using config  ${Config.defaultConfigPath}`,
-        `Host 'ch' deleted`,
-      ]);
+      assert.ok(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert.ok(result.stdout.includes('Host \'ch\' deleted'));
     });
   });
 });
