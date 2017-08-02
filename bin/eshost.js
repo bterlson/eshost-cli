@@ -60,6 +60,8 @@ const yargv = yargs
   .help('help')
   .example('eshost --list')
   .example('eshost --add d8 d8 path/to/d8 --args "--harmony"')
+  .example('eshost --add ch ch path/to/ch --tags latest')
+  .example('eshost --add ch ch path/to/ch --tags latest,greatest')
   .example('eshost test.js')
   .example('eshost -e "1+1"')
   .example('eshost -its -x "for (let i=0; i<10; ++i) { print(i) }"')
@@ -69,6 +71,7 @@ const yargv = yargs
   .example('eshost -h d8 -g node test.js')
   .example('eshost -h ch-*,node test.js')
   .example('eshost -h ch-1.?.? test.js')
+  .example('eshost --tags latest test.js')
   .fail(function (msg, err) {
     if (err) {
       console.error(err.stack);
