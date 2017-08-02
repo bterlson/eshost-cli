@@ -245,18 +245,15 @@ describe('eshost --add', () => {
   it('allows adding a valid host with --tags (>1)', () => {
     let add = '--add ch ch /path/to/ch --tags latest,greatest';
     return eshost(add).then(result => {
-      let lines = toLines(result.stdout);
       assert.equal(result.stderr, '');
 
-      if (lines[1].includes('added')) {
+      if (result.stdout.includes('Host \'ch\' added')) {
         return eshost('--list').then(result => {
           assert.equal(result.stderr, '');
-
-          let lines = toLines(result.stdout);
           /*
           │ ch   │ ch   │ /usr/local/bin/ch │      │ latest,greatest │
            */
-          assert.ok(lines[4].includes('latest,greatest'));
+          assert.ok(result.stdout.includes('latest,greatest'));
       });
       } else {
         return Promise.reject(`'${add}' failed`);
