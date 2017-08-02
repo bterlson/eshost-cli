@@ -109,14 +109,11 @@ describe('eshost --list', () => {
     restoreOriginalHostConfig();
   });
 
-  it('displays empty list when there are no hosts configured', () => {
+  it('displays "No configured hosts" when no hosts are configured', () => {
     return eshost('--list').then(result => {
-      assert.deepEqual(toLines(result.stdout), [
-        `Using config  ${Config.defaultConfigPath}`,
-        '┌──────┬──────┬──────┬──────┬──────┐',
-        '│ name │ type │ path │ args │ tags │',
-        '└──────┴──────┴──────┴──────┴──────┘'
-      ]);
+      assert.equal(result.stderr, '');
+      assert.ok(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert.ok(result.stdout.includes('No configured hosts'));
     });
   });
 
