@@ -76,10 +76,6 @@ function emptyHostConfig() {
   fs.writeFileSync(Config.defaultConfigPath, '{"hosts":{}}');
 }
 
-function toLines(result) {
-  return (result || '').split('\n').map(value => value.trim()).filter(Boolean);
-}
-
 function toHostPath(hostpath) {
   return path.normalize(hostpath) + (isWindows ? '.exe' : '');
 }
@@ -93,17 +89,16 @@ describe('eshost --help', () => {
     return eshost('--help').then(result => {
       assert.equal(result.stderr, '');
 
-      assert.ok(result.stdout.includes('Usage: eshost [options] [input-file]'));
-      assert.ok(result.stdout.includes('eshost [options] -e "input-script"'));
-      assert.ok(result.stdout.includes('eshost --list'));
-      assert.ok(result.stdout.includes('eshost --add [host name] [host type] <host path> --args <host arguments>'));
-      assert.ok(result.stdout.includes('eshost --delete [host name]'));
+      assert(result.stdout.includes('Usage: eshost [options] [input-file]'));
+      assert(result.stdout.includes('eshost [options] -e "input-script"'));
+      assert(result.stdout.includes('eshost --list'));
+      assert(result.stdout.includes('eshost --add [host name] [host type] <host path> --args <host arguments>'));
+      assert(result.stdout.includes('eshost --delete [host name]'));
     });
   });
 });
 
 describe('eshost --list', () => {
-
   beforeEach(function() {
     emptyHostConfig();
   });
@@ -115,8 +110,8 @@ describe('eshost --list', () => {
   it('displays "No configured hosts" when no hosts are configured', () => {
     return eshost('--list').then(result => {
       assert.equal(result.stderr, '');
-      assert.ok(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
-      assert.ok(result.stdout.includes('No configured hosts'));
+      assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert(result.stdout.includes('No configured hosts'));
     });
   });
 
@@ -135,10 +130,10 @@ describe('eshost --list', () => {
       /*
       │ js   │ jsshell │ /path/to/js │      │      │
       */
-      assert.ok(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
-      assert.ok(/\bjs\b/m.test(result.stdout));
-      assert.ok(/\bjsshell\b/m.test(result.stdout));
-      assert.ok(result.stdout.includes(toHostPath('js')));
+      assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert(/\bjs\b/m.test(result.stdout));
+      assert(/\bjsshell\b/m.test(result.stdout));
+      assert(result.stdout.includes(toHostPath('js')));
     });
   });
 
@@ -163,18 +158,17 @@ describe('eshost --list', () => {
       ├──────┼─────────┼─────────────┼──────┼──────┤
       │ ch   │ ch      │ /path/to/ch │      │      │
       */
-      assert.ok(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
-      assert.ok(/\bjs\b/m.test(result.stdout));
-      assert.ok(/\bjsshell\b/m.test(result.stdout));
-      assert.ok(result.stdout.includes(toHostPath('js')));
-      assert.ok(/\bch\b/m.test(result.stdout));
-      assert.ok(result.stdout.includes(toHostPath('ch')));
+      assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert(/\bjs\b/m.test(result.stdout));
+      assert(/\bjsshell\b/m.test(result.stdout));
+      assert(result.stdout.includes(toHostPath('js')));
+      assert(/\bch\b/m.test(result.stdout));
+      assert(result.stdout.includes(toHostPath('ch')));
     });
   });
 });
 
 describe('eshost --add', () => {
-
   beforeEach(function() {
     emptyHostConfig();
   });
@@ -187,16 +181,16 @@ describe('eshost --add', () => {
     emptyHostConfig()
     return eshost('--add ch ch /path/to/ch').then(result => {
       assert.equal(result.stderr, '');
-      assert.ok(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
-      assert.ok(result.stdout.includes('Host \'ch\' added'));
+      assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert(result.stdout.includes('Host \'ch\' added'));
     });
   });
 
   it('disallows adding an invalid host', () => {
     return eshost('--add invalid invalid /path/to/invalid').then(result => {
       assert.equal(result.stderr, '');
-      assert.ok(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
-      assert.ok(result.stdout.includes('Host type \'invalid\' not supported'));
+      assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert(result.stdout.includes('Host type \'invalid\' not supported'));
     });
   });
 
@@ -211,7 +205,7 @@ describe('eshost --add', () => {
           /*
           │ ch   │ ch   │ /path/to/ch │ -Intl- │      │
            */
-          assert.ok(/-Intl-/m.test(result.stdout));
+          assert(/-Intl-/m.test(result.stdout));
         });
       } else {
         return Promise.reject(`'${add}' failed`);
@@ -230,7 +224,7 @@ describe('eshost --add', () => {
           /*
           │ ch   │ ch   │ /usr/local/bin/ch │      │ latest │
            */
-          assert.ok(/\blatest\b/m.test(result.stdout));
+          assert(/\blatest\b/m.test(result.stdout));
         });
       } else {
         return Promise.reject(`'${add}' failed`);
@@ -249,7 +243,7 @@ describe('eshost --add', () => {
           /*
           │ ch   │ ch   │ /usr/local/bin/ch │      │ latest,greatest │
            */
-          assert.ok(result.stdout.includes('latest,greatest'));
+          assert(result.stdout.includes('latest,greatest'));
       });
       } else {
         return Promise.reject(`'${add}' failed`);
@@ -279,14 +273,13 @@ describe('eshost --delete', () => {
 
     return eshost('--delete ch').then(result => {
       assert.equal(result.stderr, '');
-      assert.ok(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
-      assert.ok(result.stdout.includes('Host \'ch\' deleted'));
+      assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert(result.stdout.includes('Host \'ch\' deleted'));
     });
   });
 });
 
 describe('eshost --eval', () => {
-
   before(function() {
     fs.writeFileSync(Config.defaultConfigPath, JSON.stringify({
       hosts: {
@@ -314,54 +307,40 @@ describe('eshost --eval', () => {
   it('evaluates code and displays the result for all hosts', () => {
     return eshost('--eval " 1 + 1 "').then(result => {
       assert.equal(result.stderr, '');
-      assert.deepEqual(toLines(result.stdout), [
-        '#### node',
-        '2',
-        '#### ch',
-        '2',
-      ]);
+      assert(/#### ch\n2/m.test(result.stdout));
+      assert(/#### node\n2/m.test(result.stdout));
     });
   });
 
   it('evaluates code and displays the result for a specific host', () => {
     return eshost('--eval " 1 + 1 " --host ch').then(result => {
       assert.equal(result.stderr, '');
-      assert.deepEqual(toLines(result.stdout), [
-        '#### ch',
-        '2',
-      ]);
+      assert(/#### ch\n2/m.test(result.stdout));
+      assert(!/#### node\n2/m.test(result.stdout));
     });
   });
 
   it('evaluates code and displays the result for a specific host group', () => {
     return eshost('--eval " 1 + 1 " --hostGroup ch,node').then(result => {
       assert.equal(result.stderr, '');
-      assert.deepEqual(toLines(result.stdout), [
-        '#### node',
-        '2',
-        '#### ch',
-        '2',
-      ]);
+      assert(/#### ch\n2/m.test(result.stdout));
+      assert(/#### node\n2/m.test(result.stdout));
     });
   });
 
   it('evaluates code and displays the result for a specific tag', () => {
     return eshost('--eval " 1 + 1 " --tags latest').then(result => {
       assert.equal(result.stderr, '');
-      assert.deepEqual(toLines(result.stdout), [
-        '#### ch',
-        '2',
-      ]);
+      assert(/#### ch\n2/m.test(result.stdout));
+      assert(!/#### node\n2/m.test(result.stdout));
     });
   });
 
   it('evaluates code and displays the result for specific tags', () => {
     return eshost('--eval " 1 + 1 " --tags latest,greatest').then(result => {
       assert.equal(result.stderr, '');
-      assert.deepEqual(toLines(result.stdout), [
-        '#### ch',
-        '2',
-      ]);
+      assert(/#### ch\n2/m.test(result.stdout));
+      assert(!/#### node\n2/m.test(result.stdout));
     });
   });
 });
