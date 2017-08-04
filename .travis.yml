@@ -1,0 +1,11 @@
+---
+language: node_js
+node_js: "6"
+dist: trusty
+sudo: false
+install: '
+    wget https://aka.ms/chakracore/cc_linux_x64_1_5_2;
+    tar -xvf cc_linux_x64_1_5_2;
+    export PATH=$PATH:$(pwd)/ChakraCoreFiles/bin;
+    npm install
+    '
