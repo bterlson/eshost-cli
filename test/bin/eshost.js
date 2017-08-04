@@ -93,8 +93,11 @@ describe('eshost --help', () => {
     return eshost('--help').then(result => {
       assert.equal(result.stderr, '');
 
-      // TODO: Determine important things to assert about the help text
-      assert.notEqual(result.stdout, '');
+      assert.ok(result.stdout.includes('Usage: eshost [options] [input-file]'));
+      assert.ok(result.stdout.includes('eshost [options] -e "input-script"'));
+      assert.ok(result.stdout.includes('eshost --list'));
+      assert.ok(result.stdout.includes('eshost --add [host name] [host type] <host path> --args <host arguments>'));
+      assert.ok(result.stdout.includes('eshost --delete [host name]'));
     });
   });
 });
