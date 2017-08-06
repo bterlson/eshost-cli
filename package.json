@@ -14,9 +14,11 @@
     "temp": "^0.8.3",
     "yargs": "^3.31.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "^3.5.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test/**/*"
   },
   "repository": {
     "type": "git",
