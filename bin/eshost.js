@@ -53,6 +53,8 @@ const yargv = yargs
   .alias('l', 'list')
   .describe('add', 'add a host')
   .nargs('add', 2)
+  .describe('edit', 'edit a host')
+  .nargs('edit', 1)
   .describe('delete', 'delete a host')
   .nargs('delete', 1)
   .describe('args', 'set arguments for a host entry (use with --add)')
@@ -188,16 +190,23 @@ if (argv.list) {
   process.exit(0);
 }
 
+if (argv.args && !(argv.add || argv.edit)) {
+  console.error('Use --args with --add or --edit');
+  process.exit(1);
+}
+
 // add a host
 if (argv.add) {
   hostManager.add(config, argv.add[0], argv.add[1], argv._[0], argv.args, hostTags);
   console.log(`Host '${argv.add[0]}' added`);
   process.exit(0);
-} else {
-  if (argv.args) {
-    console.error('Use --args with --add');
-    process.exit(1);
-  }
+}
+
+// edit a host
+if (argv.edit) {
+  hostManager.edit(config, argv.edit, argv.args, hostTags);
+  console.log(`Host '${argv.edit}' edited`);
+  process.exit(0);
 }
 
 // delete a host
