@@ -190,11 +190,6 @@ if (argv.list) {
   process.exit(0);
 }
 
-if (argv.args && !(argv.add || argv.edit)) {
-  console.error('Use --args with --add or --edit');
-  process.exit(1);
-}
-
 // add a host
 if (argv.add) {
   hostManager.add(config, argv.add[0], argv.add[1], argv._[0], argv.args, hostTags);
@@ -207,6 +202,12 @@ if (argv.edit) {
   hostManager.edit(config, argv.edit, argv.args, hostTags);
   console.log(`Host '${argv.edit}' edited`);
   process.exit(0);
+}
+
+if (argv.args) {
+  // at this point in execution, implies (argv.args && !(argv.add || argv.edit))
+  console.error('Use --args with --add or --edit');
+  process.exit(1);
 }
 
 // delete a host
