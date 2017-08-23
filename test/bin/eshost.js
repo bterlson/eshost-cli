@@ -283,12 +283,12 @@ describe('eshost --eval', () => {
   before(function() {
     fs.writeFileSync(Config.defaultConfigPath, JSON.stringify({
       hosts: {
-        'node': {
+        node: {
           type: 'node',
           path: toHostPath('node'),
           args: '--harmony'
         },
-        'ch': {
+        ch: {
           type: 'ch',
           path: toHostPath('ch'),
           tags: [
@@ -304,43 +304,148 @@ describe('eshost --eval', () => {
     restoreOriginalHostConfig();
   });
 
-  it('evaluates code and displays the result for all hosts', () => {
-    return eshost('--eval " 1 + 1 "').then(result => {
-      assert.equal(result.stderr, '');
-      assert(/#### ch\n2/m.test(result.stdout));
-      assert(/#### node\n2/m.test(result.stdout));
+  describe('(default)', () => {
+    it('evaluates code and displays the result for all hosts', () => {
+      return eshost('--eval " 1 + 1 "').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### ch\n2/m.test(result.stdout));
+        assert(/#### node\n2/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for a specific host', () => {
+      return eshost('--eval " 1 + 1 " --host ch').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### ch\n2/m.test(result.stdout));
+        assert(!/#### node\n2/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for a specific host group', () => {
+      return eshost('--eval " 1 + 1 " --hostGroup ch,node').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### ch\n2/m.test(result.stdout));
+        assert(/#### node\n2/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for a specific tag', () => {
+      return eshost('--eval " 1 + 1 " --tags latest').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### ch\n2/m.test(result.stdout));
+        assert(!/#### node\n2/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for specific tags', () => {
+      return eshost('--eval " 1 + 1 " --tags latest,greatest').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### ch\n2/m.test(result.stdout));
+        assert(!/#### node\n2/m.test(result.stdout));
+      });
     });
   });
 
-  it('evaluates code and displays the result for a specific host', () => {
-    return eshost('--eval " 1 + 1 " --host ch').then(result => {
-      assert.equal(result.stderr, '');
-      assert(/#### ch\n2/m.test(result.stdout));
-      assert(!/#### node\n2/m.test(result.stdout));
+  describe('--table', () => {
+    it('evaluates code and displays the result for all hosts', () => {
+      return eshost('--table --eval " 1 + 1 "').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/\│.+ch.+2.+\│/.test(result.stdout));
+        assert(/\│.+node.+2.+\│/.test(result.stdout));
+      });
     });
-  });
 
-  it('evaluates code and displays the result for a specific host group', () => {
-    return eshost('--eval " 1 + 1 " --hostGroup ch,node').then(result => {
-      assert.equal(result.stderr, '');
-      assert(/#### ch\n2/m.test(result.stdout));
-      assert(/#### node\n2/m.test(result.stdout));
+    it('evaluates code and displays the result for a specific host', () => {
+      return eshost('--table --eval " 1 + 1 " --host ch').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/\│.+ch.+2.+\│/.test(result.stdout));
+        assert(!/\│.+node.+2.+\│/.test(result.stdout));
+      });
     });
-  });
 
-  it('evaluates code and displays the result for a specific tag', () => {
-    return eshost('--eval " 1 + 1 " --tags latest').then(result => {
-      assert.equal(result.stderr, '');
-      assert(/#### ch\n2/m.test(result.stdout));
-      assert(!/#### node\n2/m.test(result.stdout));
+    it('evaluates code and displays the result for a specific host group', () => {
+      return eshost('--table --eval " 1 + 1 " --hostGroup ch,node').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/\│.+ch.+2.+\│/.test(result.stdout));
+        assert(/\│.+node.+2.+\│/.test(result.stdout));
+      });
     });
-  });
 
-  it('evaluates code and displays the result for specific tags', () => {
-    return eshost('--eval " 1 + 1 " --tags latest,greatest').then(result => {
-      assert.equal(result.stderr, '');
-      assert(/#### ch\n2/m.test(result.stdout));
-      assert(!/#### node\n2/m.test(result.stdout));
+    it('evaluates code and displays the result for a specific tag', () => {
+      return eshost('--table --eval " 1 + 1 " --tags latest').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/\│.+ch.+2.+\│/.test(result.stdout));
+        assert(!/\│.+node.+2.+\│/.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for specific tags', () => {
+      return eshost('--table --eval " 1 + 1 " --tags latest,greatest').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/ch/.test(result.stdout));
+        assert(!/\│.+node.+2.+\│/.test(result.stdout));
+      });
     });
   });
 });
+
+describe('eshost --unanimous --eval', () => {
+  before(function() {
+    fs.writeFileSync(Config.defaultConfigPath, JSON.stringify({
+      hosts: {
+        node: {
+          type: 'node',
+          path: toHostPath('node'),
+        },
+        ch: {
+          type: 'ch',
+          path: toHostPath('ch'),
+        },
+        js: {
+          type: 'jsshell',
+          path: toHostPath('js'),
+        }
+      }
+    }));
+  });
+
+  after(function() {
+    restoreOriginalHostConfig();
+  });
+
+  describe('(default)', () => {
+    it('displays nothing when all results are unanimous', () => {
+      return eshost('--unanimous --eval " 1 + 1 "').then(result => {
+        assert.equal(result.stderr, '');
+        assert.equal(result.stdout.trim().length, 0);
+      });
+    });
+
+    it('displays results when results are varied', () => {
+      return eshost('--unanimous --eval "typeof gc"').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### js\nfunction/.test(result.stdout));
+        assert(/#### ch\nundefined/.test(result.stdout));
+        assert(/#### node\nundefined/.test(result.stdout));
+      });
+    });
+  });
+
+  describe('--table', () => {
+    it('displays nothing when all results are unanimous', () => {
+      return eshost('--unanimous --table --eval " 1 + 1 "').then(result => {
+        assert.equal(result.stderr, '');
+        assert.equal(result.stdout.trim().length, 0);
+      });
+    });
+
+    it('displays results when results are varied', () => {
+      return eshost('--unanimous --table --eval "typeof gc"').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/\│.+ch.+undefined.+\│/.test(result.stdout));
+        assert(/\│.+js.+function.+\│/.test(result.stdout));
+      });
+    });
+  });
+});
+
