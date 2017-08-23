@@ -177,7 +177,6 @@ if (hosts.length === 0) {
 }
 
 let reporterOptions = {
-  showSource: argv.showSource,
   coalesce: argv.coalesce,
   showSource: argv.showSource,
   unanimous: argv.unanimous
