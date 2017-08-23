@@ -38,7 +38,7 @@ eshost -e "Map.length"
 
 ### Managing Hosts
 
-You can --add, --list, and --delete hosts. Adding a host requires a name, type, and path to the runtime executable. You can optionally pass arguments using --args. The same host can be added multiple times with different --args which makes it easy to compare the output of runtimes given different options (eg. by turning language features on and off).
+You can --list, --add, --edit, and --delete hosts. Adding a host requires a name, type, and path to the runtime executable. You can optionally pass arguments using --args. The same host can be added multiple times with different --args which makes it easy to compare the output of runtimes given different options (eg. by turning language features on and off).
 
 Console hosts are either provided by the browser vendors or, more likely, built from source.
 
