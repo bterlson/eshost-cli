@@ -45,6 +45,9 @@ const yargv = yargs
   .describe('showSource', 'show input source')
   .boolean('showSource')
   .alias('showSource', 'i')
+  .describe('unanimous', 'If all engines agree, exit(0) with no output, otherwise print and exit(1); implies --coalesce')
+  .boolean('unanimous')
+  .alias('unanimous', 'u')
   .nargs('h', 1)
   .describe('async', 'wait for realm destruction before reporting results')
   .boolean('async')
@@ -72,6 +75,7 @@ const yargv = yargs
   .example('eshost -h ch-*,node test.js')
   .example('eshost -h ch-1.?.? test.js')
   .example('eshost --tags latest test.js')
+  .example('eshost --unanimous test.js')
   .fail(function (msg, err) {
     if (err) {
       console.error(err.stack);
@@ -82,6 +86,11 @@ const yargv = yargs
   });
 
 const argv = yargv.argv;
+
+// --unanimous implies --coalesce
+if (argv.unanimous) {
+  argv.coalesce = true;
+}
 
 let config;
 if (argv.c) {
@@ -168,12 +177,10 @@ if (hosts.length === 0) {
 }
 
 let reporterOptions = {
+  coalesce: argv.coalesce,
   showSource: argv.showSource,
-  coalesce: argv.coalesce
+  unanimous: argv.unanimous
 };
-if (argv.showSource) {
-  reporterOptions.showSource = true;
-}
 
 let reporter;
 if (argv.table) {
