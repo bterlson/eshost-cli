@@ -26,7 +26,6 @@ if (isWindows) {
   });
 }
 
-
 function eshost(command = []) {
   let args = [];
 
@@ -38,8 +37,15 @@ function eshost(command = []) {
     }
   }
 
+  let spawnArgs = [
+    './bin/eshost.js',
+    // To avoid messing with a real configuration, use a test-local config
+    '--config',
+    Config.defaultConfigPath,
+  ].concat(args);
+
   return new Promise((resolve, reject) => {
-    let cps = cp.spawn(process.execPath, ['./bin/eshost.js'].concat(args));
+    let cps = cp.spawn(process.execPath, spawnArgs);
     let stdout = '';
     let stderr = '';
     cps.stdout.on('data', buffer => { stdout += buffer; });
@@ -55,23 +61,7 @@ function eshost(command = []) {
   });
 }
 
-let originalHostConfig;
-let nohosts = '{"hosts":{}}';
-try {
-  if (fs.existsSync(Config.defaultConfigPath)) {
-    originalHostConfig = fs.readFileSync(Config.defaultConfigPath, 'utf-8');
-  } else {
-    originalHostConfig = nohosts;
-  }
-} catch (error) {
-  originalHostConfig = nohosts;
-}
-
-function restoreOriginalHostConfig() {
-  fs.writeFileSync(Config.defaultConfigPath, originalHostConfig);
-}
-
-function emptyHostConfig() {
+function resetHostConfig() {
   fs.writeFileSync(Config.defaultConfigPath, '{"hosts":{}}');
 }
 
@@ -79,9 +69,8 @@ function toHostPath(hostpath) {
   return path.normalize(hostpath) + (isWindows ? '.exe' : '');
 }
 
-before(function() {
-  restoreOriginalHostConfig();
-});
+beforeEach(() => resetHostConfig());
+afterEach(() => resetHostConfig());
 
 describe('eshost --help', () => {
   it('displays help contents', () => {
@@ -98,14 +87,6 @@ describe('eshost --help', () => {
 });
 
 describe('eshost --list', () => {
-  beforeEach(function() {
-    emptyHostConfig();
-  });
-
-  after(function() {
-    restoreOriginalHostConfig();
-  });
-
   it('displays "No configured hosts" when no hosts are configured', () => {
     return eshost('--list').then(result => {
       assert.equal(result.stderr, '');
@@ -168,16 +149,7 @@ describe('eshost --list', () => {
 });
 
 describe('eshost --add', () => {
-  beforeEach(function() {
-    emptyHostConfig();
-  });
-
-  after(function() {
-    restoreOriginalHostConfig();
-  });
-
   it('allows adding a valid host', () => {
-    emptyHostConfig()
     return eshost('--add ch ch /path/to/ch').then(result => {
       assert.equal(result.stderr, '');
       assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
@@ -252,10 +224,6 @@ describe('eshost --add', () => {
 });
 
 describe('eshost --delete', () => {
-  after(function() {
-    restoreOriginalHostConfig();
-  });
-
   it('allows deleting a host', () => {
     fs.writeFileSync(Config.defaultConfigPath, JSON.stringify({
       hosts: {
@@ -279,7 +247,7 @@ describe('eshost --delete', () => {
 });
 
 describe('eshost --eval', () => {
-  before(function() {
+  beforeEach(() => {
     fs.writeFileSync(Config.defaultConfigPath, JSON.stringify({
       hosts: {
         node: {
@@ -297,10 +265,6 @@ describe('eshost --eval', () => {
         }
       }
     }));
-  });
-
-  after(function() {
-    restoreOriginalHostConfig();
   });
 
   describe('(default)', () => {
@@ -389,7 +353,7 @@ describe('eshost --eval', () => {
 });
 
 describe('eshost --unanimous --eval', () => {
-  before(function() {
+  beforeEach(() => {
     fs.writeFileSync(Config.defaultConfigPath, JSON.stringify({
       hosts: {
         node: {
@@ -406,10 +370,6 @@ describe('eshost --unanimous --eval', () => {
         }
       }
     }));
-  });
-
-  after(function() {
-    restoreOriginalHostConfig();
   });
 
   describe('(default)', () => {
