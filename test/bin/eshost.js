@@ -39,10 +39,9 @@ function eshost(command = []) {
   }
 
   return new Promise((resolve, reject) => {
-    let cps = cp.spawn('./bin/eshost.js', args);
+    let cps = cp.spawn(process.execPath, ['./bin/eshost.js'].concat(args));
     let stdout = '';
     let stderr = '';
-
     cps.stdout.on('data', buffer => { stdout += buffer; });
     cps.stderr.on('data', buffer => { stderr += buffer; });
     cps.on('close', () => {
