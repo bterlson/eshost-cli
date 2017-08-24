@@ -1,2 +1,3 @@
 node_modules
 local-config.js
+test/config/.eshost-config.json
