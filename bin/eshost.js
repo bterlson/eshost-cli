@@ -7,6 +7,7 @@ const yargs = require('yargs');
 const Config = require('../lib/config.js')
 const Path = require('path');
 const chalk = require('chalk');
+
 const hostManager = require('../lib/host-manager.js') ;
 const Table = require('cli-table');
 const DefaultReporter = require('../lib/reporters/default.js');
@@ -140,7 +141,7 @@ if (hostGroups) {
   for (let group of hostGroups) {
     for (let hostName of Object.keys(config.hosts)) {
       let hostType = config.hosts[hostName].type;
-      if (group === hostType && !hosts.includes(hostName)) {
+      if (group === hostType) {
         hosts.push(hostName);
       }
     }
@@ -156,7 +157,6 @@ if (Array.isArray(argv.tags)) {
 
 if (hostTags) {
   function includesAnyOf(a, b) {
-    // console.log(`${a} includesAnyOf ${b}`); // TODO (dilijev) remove
     for (let x of a) {
       if (b.includes(x)) {
         return true;
@@ -177,6 +177,8 @@ if (hostTags) {
 if (hosts.length === 0) {
   hosts = Object.keys(config.hosts);
 }
+
+hosts = [ ... new Set(hosts) ]; // take unique elements
 
 let reporterOptions = {
   coalesce: argv.coalesce,
