@@ -309,6 +309,24 @@ describe('eshost --eval', () => {
     });
   });
 
+  describe('(deduping)', () => {
+    it('dedupes hosts, for a specific host list', () => {
+      return eshost('--eval " 1 + 1 " --host ch,ch,node,node').then(result => {
+        assert.equal(result.stderr, '');
+        assert.equal(result.stdout.match(/#### ch\n2/gm).length, 1);
+        assert.equal(result.stdout.match(/#### node\n2/gm).length, 1);
+      });
+    });
+
+    it('dedupes hosts, for a specific host group list', () => {
+      return eshost('--eval " 1 + 1 " --hostGroup ch,ch,node,node').then(result => {
+        assert.equal(result.stderr, '');
+        assert.equal(result.stdout.match(/#### ch\n2/gm).length, 1);
+        assert.equal(result.stdout.match(/#### node\n2/gm).length, 1);
+      });
+    });
+  });
+
   describe('--table', () => {
     it('evaluates code and displays the result for all hosts', () => {
       return eshost('--table --eval " 1 + 1 "').then(result => {
