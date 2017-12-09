@@ -6,7 +6,7 @@ See eshost's [supported hosts](https://github.com/bterlson/eshost#supported-host
 
 ### Usage
 
-See --help output for the full details. Basic usage:
+See `--help` output for the full details. Basic usage:
 
 * Add hosts using `eshost --add <host name> <host type> <host path> --args <optional arguments>`.
 * Eval an expression using `eshost -e [1,2,3].length`.
@@ -38,19 +38,19 @@ eshost -e "Map.length"
 
 ### Managing Hosts
 
-You can --list, --add, --edit, and --delete hosts. Adding a host requires a name, type, and path to the runtime executable. You can optionally pass arguments using --args. The same host can be added multiple times with different --args which makes it easy to compare the output of runtimes given different options (eg. by turning language features on and off).
+You can `--list`, `--add`, `--edit`, and `--delete` hosts. Adding a host requires a name, type, and path to the runtime executable. You can optionally pass arguments using `--args`. The same host can be added multiple times with different `--args` which makes it easy to compare the output of runtimes given different options (e.g. by turning language features on and off).
 
-Console hosts are either provided by the browser vendors or, more likely, built from source.
+Console hosts are either provided by the browser vendors or, more likely, built from source. [The `jsvu` CLI](https://github.com/GoogleChromeLabs/jsvu) makes it easy to install and update the most common JavaScript engine binaries.
 
 Host types are [those provided by eshost](https://github.com/bterlson/eshost#supported-hosts), namely:
 
-* ch
-* jsshell
-* d8
-* jsc
-* nashorn
-* node
-* chrome
-* firefox
-* safari
-* edge
+* `ch`
+* `jsshell`
+* `d8`
+* `jsc`
+* `nashorn`
+* `node`
+* `chrome`
+* `firefox`
+* `safari`
+* `edge`
