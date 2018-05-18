@@ -63,18 +63,19 @@ const yargv = yargs
   .nargs('delete', 1)
   .describe('args', 'set arguments for a host entry (use with --add)')
   .nargs('args', 1)
-  .describe('configure-jsvu', 'Configure JSVU hosts in the config')
+  .describe('configure-jsvu', 'Configure jsvu hosts in the config')
   .boolean('configure-jsvu')
-  .describe('jsvu-root', 'Use this path containing the .jsvu folder (use this option if .jsvu is located somewhere other than the home directory).')
-  .nargs('jsvu-root', 1)
-  .describe('jsvu-prefix', 'Set the prefix of the configured hosts. If prefix is "jsvu" then hosts will be configured as, e.g., "jsvu-sm". By default, no prefix (e.g. "sm").')
+  .describe('jsvu-prefix', '[OPTIONAL] Set the prefix of the configured hosts. If prefix is "jsvu" then hosts will be configured as, e.g., "jsvu-sm". By default, no prefix (e.g. "sm"). Use this flag with --configure-jsvu.')
   .nargs('jsvu-prefix', 1)
+  .describe('jsvu-root', '[OPTIONAL] Use this path containing the .jsvu folder (use this option if .jsvu is located somewhere other than the home directory). Use this flag with --configure-jsvu.')
+  .nargs('jsvu-root', 1)
   .help('help')
   .example('eshost --list')
   .example('eshost --add d8 d8 path/to/d8 --args "--harmony"')
   .example('eshost --add ch ch path/to/ch --tags latest')
   .example('eshost --add ch ch path/to/ch --tags latest,greatest')
-  .example('eshost --configure-jsvu --jsvu-root /my/jsvu/root --jsvu-prefix jsvu')
+  .example('eshost --configure-jsvu')
+  .example('eshost --configure-jsvu --jsvu-prefix jsvu')
   .example('eshost test.js')
   .example('eshost -e "1+1"')
   .example('eshost -its -x "for (let i=0; i<10; ++i) { print(i) }"')
@@ -234,7 +235,7 @@ if (argv.delete) {
 }
 
 if (argv['configure-jsvu']) {
-  hostManager.configureJSVU(config, argv['jsvu-root'], argv['jsvu-prefix']);
+  hostManager.configureJsvu(config, argv['jsvu-root'], argv['jsvu-prefix']);
 }
 
 const file = argv._[0];
