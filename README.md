@@ -58,14 +58,14 @@ Console hosts are either provided by the browser vendors or, more likely, built 
 
 Host types are [those provided by eshost](https://github.com/bterlson/eshost#supported-hosts), namely:
 
+* `node`
 * `ch`
-* `jsshell`
 * `d8`
+* `jsshell`
 * `jsc`
 * `xs`
 * `nashorn`
-* `node`
+* `edge`
 * `chrome`
 * `firefox`
 * `safari`
-* `edge`
