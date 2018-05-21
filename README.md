@@ -9,16 +9,17 @@ See eshost's [supported hosts](https://github.com/bterlson/eshost#supported-host
 See `--help` output for the full details. Basic usage:
 
 * Add hosts using `eshost --add <host name> <host type> <host path> --args <optional arguments>`.
+* Automatically configure [`jsvu`](https://github.com/GoogleChromeLabs/jsvu)-installed hosts using `eshost --configure-jsvu`.
 * Eval an expression using `eshost -e [1,2,3].length`.
 * Execute a script using `eshost path/to/script.js`.
 
 #### Examples
 
 ```
-npm install -g eshost-cli
-eshost --help
-eshost --add <name> <type> <path to host executable> --args <optional arguments>
-eshost -e "Map.length"
+$ npm install -g eshost-cli
+$ eshost --help
+$ eshost --add <name> <type> <path to host executable> --args <optional arguments>
+$ eshost -e "Map.length"
 
 ## chakra-es6
 0
@@ -34,6 +35,19 @@ eshost -e "Map.length"
 
 ## node
 0
+
+$ eshost --configure-jsvu --jsvu-prefix jsvu
+$ eshost --tags jsvu-web -itsx "let a = 40+2; print(a)"
+
+## Source
+let a = 40+2; print(a)
+
+┌──────────┬────┐
+│ jsvu-ch  │ 42 │
+│ jsvu-jsc │    │
+│ jsvu-sm  │    │
+│ jsvu-v8  │    │
+└──────────┴────┘
 ```
 
 ### Managing Hosts
@@ -48,6 +62,7 @@ Host types are [those provided by eshost](https://github.com/bterlson/eshost#sup
 * `jsshell`
 * `d8`
 * `jsc`
+* `xs`
 * `nashorn`
 * `node`
 * `chrome`
