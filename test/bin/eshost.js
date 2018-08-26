@@ -404,8 +404,7 @@ describe('eshost --unanimous --eval', () => {
       return eshost('--unanimous --eval "typeof gc"').then(result => {
         assert.equal(result.stderr, '');
         assert(/#### js\nfunction/.test(result.stdout));
-        assert(/#### ch\nundefined/.test(result.stdout));
-        assert(/#### node\nundefined/.test(result.stdout));
+        assert(/#### ch, node\nundefined/.test(result.stdout));
       });
     });
   });
