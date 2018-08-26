@@ -8,6 +8,9 @@ const tokenize = require('yargs/lib/tokenize-arg-string');
 
 const Config = require('../../lib/config');
 
+// To avoid messing with a real configuration, use a test-local config
+Config.defaultConfigPath = path.join(__dirname, '../config/.eshost-config.json');
+
 const isWindows = process.platform === 'win32' ||
   process.env.OSTYPE === 'cygwin' ||
   process.env.OSTYPE === 'msys';
@@ -39,7 +42,6 @@ function eshost(command = []) {
 
   let spawnArgs = [
     './bin/eshost.js',
-    // To avoid messing with a real configuration, use a test-local config
     '--config',
     Config.defaultConfigPath,
   ].concat(args);
