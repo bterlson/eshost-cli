@@ -10,8 +10,8 @@ See `--help` output for the full details. Basic usage:
 
 * Add hosts using `eshost --add <host name> <host type> <host path> --args <optional arguments>`.
 * Automatically configure [`jsvu`](https://github.com/GoogleChromeLabs/jsvu)-installed hosts using `eshost --configure-jsvu`.
-* Eval an expression using `eshost -e '[1,2,3].length'`.
-* Execute a multi-statement program using `eshost -x 'foo = 42; print(foo);`
+* Eval an expression using `eshost -e "[1,2,3].length"`.
+* Execute a multi-statement program using `eshost -x "foo = 42; print(foo);"`
 * Execute a script using `eshost path/to/script.js`.
 
 #### Examples
