@@ -270,8 +270,14 @@ if (file) {
 }
 
 function runInHost(host, code) {
+  let promise;
+  if (host.custom) {
+    promise = esh.createCustomAgent(host.path, { hostArguments: host.args, hostPath: host.path });
+  } else {
+    promise = esh.createAgent(host.type, { hostArguments: host.args, hostPath: host.path });
+  }
   let runner;
-  return esh.createAgent(host.type, { hostArguments: host.args, hostPath: host.path })
+  return promise
   .then(r => {
     runner = r;
     return runner.evalScript(code, { async: argv.async });
