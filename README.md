@@ -10,9 +10,13 @@ See `--help` output for the full details. Basic usage:
 
 * Add hosts using `eshost --add <host name> <host type> <host path> --args <optional arguments>`.
 * Automatically configure [`jsvu`](https://github.com/GoogleChromeLabs/jsvu)-installed hosts using `eshost --configure-jsvu`.
-* Eval an expression using `eshost -e "[1,2,3].length"`.
-* Execute a multi-statement program using `eshost -x "foo = 42; print(foo);"`
+* Evaluate a *single* expression using `-e`: `eshost -e "[1,2,3].length"`.
+* Execute a multi-statement program using `-x`: `eshost -x "foo = 42; print(foo);"`
 * Execute a script using `eshost path/to/script.js`.
+* Execute an expression or multi-statement program as module code using `-m`: 
+  - `eshost -me "foo = 42"` (this example should result in errors!)
+  - `eshost -mx "foo = 42; print(foo);"` (this example should result in errors!)
+* Execute a source file as module code by saving the file with an `.mjs` extension: `eshost file.mjs`; or by using the `-m` option: `eshost -m file.js`
 
 #### Examples
 
@@ -59,14 +63,15 @@ Console hosts are either provided by the browser vendors or, more likely, built 
 
 Host types are [those provided by eshost](https://github.com/bterlson/eshost#supported-hosts), namely:
 
-* `node`
 * `ch`
 * `d8`
+* `engine262`
 * `jsshell`
 * `jsc`
-* `xs`
 * `nashorn`
-* `edge`
+* `node`
+* `xs`
 * `chrome`
+* `edge`
 * `firefox`
 * `safari`

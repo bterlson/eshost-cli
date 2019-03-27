@@ -17,18 +17,45 @@ const isWindows = process.platform === 'win32' ||
   process.env.OSTYPE === 'msys';
 
 const hosts = [
-  ['jsshell', { hostPath: 'js' }],
   ['ch', { hostPath: 'ch' }],
-  ['node', { hostPath: 'node' }],
   ['d8', { hostPath: 'd8' }],
+  ['engine262', { hostPath: 'engine262' }],
+  ['jsshell', { hostPath: 'js' }],
   ['jsc', { hostPath: 'jsc' }],
+  ['node', { hostPath: 'node' }],
+];
+
+const hostsOnWindows = [
+  ['ch', { hostPath: 'ch.exe' }],
+  ['d8', { hostPath: 'd8.exe' }],
+  // engine262 is intentionally NOT given an ".exe" extension!
+  ['engine262', { hostPath: 'engine262.cmd' }],
+  ['jsshell', { hostPath: 'js.exe' }],
+  ['jsc', { hostPath: 'jsc.exe' }],
+  ['node', { hostPath: 'node.exe' }],
 ];
 
 if (isWindows) {
-  hosts.forEach(record => {
-    record[1].hostPath += '.exe';
+  hosts.forEach((record, index) => {
+    const host = hostsOnWindows[index];
+    if (record[1].hostPath) {
+      if (record[0] === host[0]) {
+        record[1].hostPath = host[1].hostPath;
+      }
+      const ESHOST_ENV_NAME = `ESHOST_${record[0].toUpperCase()}_PATH`;
+      console.log(`ESHOST_ENV_NAME: ${ESHOST_ENV_NAME}`);
+      if (process.env[ESHOST_ENV_NAME]) {
+        record[1].hostPath = path.join(process.env[ESHOST_ENV_NAME], record[1].hostPath);
+        console.log(record[1].hostPath);
+      }
+    }
   });
 }
+
+const hostsByType = hosts.reduce((accum, [type, config]) => {
+  accum[type] = config;
+  return accum;
+}, {});
 
 function eshost(command = []) {
   let args = [];
@@ -68,8 +95,8 @@ function resetHostConfig() {
   fs.writeFileSync(Config.defaultConfigPath, '{"hosts":{}}');
 }
 
-function toHostPath(hostpath) {
-  return path.normalize(hostpath) + (isWindows ? '.exe' : '');
+function toHostPath(type) {
+  return path.normalize(hostsByType[type].hostPath);
 }
 
 beforeEach(() => resetHostConfig());
@@ -103,7 +130,7 @@ describe('eshost --list', () => {
       hosts: {
         js: {
           type: 'jsshell',
-          path: toHostPath('js')
+          path: toHostPath('jsshell')
         }
       }
     }));
@@ -116,7 +143,7 @@ describe('eshost --list', () => {
       assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
       assert(/\bjs\b/m.test(result.stdout));
       assert(/\bjsshell\b/m.test(result.stdout));
-      assert(result.stdout.includes(toHostPath('js')));
+      assert(result.stdout.includes(toHostPath('jsshell')));
     });
   });
 
@@ -125,7 +152,7 @@ describe('eshost --list', () => {
       hosts: {
         js: {
           type: 'jsshell',
-          path: toHostPath('js')
+          path: toHostPath('jsshell')
         },
         ch: {
           type: 'ch',
@@ -144,7 +171,7 @@ describe('eshost --list', () => {
       assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
       assert(/\bjs\b/m.test(result.stdout));
       assert(/\bjsshell\b/m.test(result.stdout));
-      assert(result.stdout.includes(toHostPath('js')));
+      assert(result.stdout.includes(toHostPath('jsshell')));
       assert(/\bch\b/m.test(result.stdout));
       assert(result.stdout.includes(toHostPath('ch')));
     });
@@ -232,7 +259,7 @@ describe('eshost --delete', () => {
       hosts: {
         js: {
           type: 'jsshell',
-          path: toHostPath('js')
+          path: toHostPath('jsshell')
         },
         ch: {
           type: 'ch',
@@ -387,7 +414,7 @@ describe('eshost --unanimous --eval', () => {
         },
         js: {
           type: 'jsshell',
-          path: toHostPath('js'),
+          path: toHostPath('jsshell'),
         }
       }
     }));
@@ -428,3 +455,174 @@ describe('eshost --unanimous --eval', () => {
   });
 });
 
+describe('eshost [input-file]', () => {
+  beforeEach(() => {
+    fs.writeFileSync(Config.defaultConfigPath, JSON.stringify({
+      hosts: {
+        node: {
+          type: 'node',
+          path: toHostPath('node'),
+        },
+        engine262: {
+          type: 'engine262',
+          path: toHostPath('engine262'),
+          tags: [
+            'latest',
+            'greatest'
+          ]
+        }
+      }
+    }));
+  });
+
+  describe('script', () => {
+    it('evaluates code and displays the result for all hosts', () => {
+      return eshost('test/bin/fixtures/script.js').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### node/m.test(result.stdout));
+        assert(/#### engine262/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for a specific host', () => {
+      return eshost('--host engine262 test/bin/fixtures/script.js').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### engine262\ntrue/m.test(result.stdout));
+        assert(!/#### node\ntrue\n\n/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for a specific host group', () => {
+      return eshost('--hostGroup engine262 test/bin/fixtures/script.js').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### engine262\ntrue/m.test(result.stdout));
+        assert(!/#### node\ntrue\n\n/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for a specific tag', () => {
+      return eshost('--tags latest test/bin/fixtures/script.js').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### engine262\ntrue/m.test(result.stdout));
+        assert(!/#### node\ntrue\n\n/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for specific tags', () => {
+      return eshost('--tags latest,greatest test/bin/fixtures/script.js').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### engine262\ntrue/m.test(result.stdout));
+        assert(!/#### node\ntrue\n\n/m.test(result.stdout));
+      });
+    });
+  });
+
+  describe('module.mjs', () => {
+    it('evaluates code and displays the result for all hosts', () => {
+      return eshost('test/bin/fixtures/module.mjs').then(result => {
+        assert(/#### node/m.test(result.stdout));
+        assert(/#### engine262/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for a specific host', () => {
+      return eshost('--host engine262 test/bin/fixtures/module.mjs').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### engine262\ntrue/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for a specific host group', () => {
+      return eshost('--hostGroup engine262 test/bin/fixtures/module.mjs').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### engine262\ntrue/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for a specific tag', () => {
+      return eshost('--tags latest test/bin/fixtures/module.mjs').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### engine262\ntrue/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for specific tags', () => {
+      return eshost('--tags latest,greatest test/bin/fixtures/module.mjs').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### engine262\ntrue/m.test(result.stdout));
+      });
+    });
+  });
+
+  describe('module.js', () => {
+    it('evaluates code and displays the result for all hosts', () => {
+      return eshost('-m test/bin/fixtures/module.js').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### node/m.test(result.stdout));
+        assert(/#### engine262/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for a specific host', () => {
+      return eshost('-m --host engine262 test/bin/fixtures/module.js').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### engine262\ntrue/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for a specific host group', () => {
+      return eshost('-m --hostGroup engine262 test/bin/fixtures/module.js').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### engine262\ntrue/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for a specific tag', () => {
+      return eshost('-m --tags latest test/bin/fixtures/module.js').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### engine262\ntrue/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for specific tags', () => {
+      return eshost('-m --tags latest,greatest test/bin/fixtures/module.js').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### engine262\ntrue/m.test(result.stdout));
+      });
+    });
+  });
+
+  describe('--table', () => {
+    it('evaluates code and displays the result for all hosts', () => {
+      return eshost('--table test/bin/fixtures/module.mjs').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/\│.+engine262.+\│/.test(result.stdout));
+        assert(/\│.+node.+\│/.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for a specific host group', () => {
+      return eshost('--table test/bin/fixtures/module.mjs --hostGroup engine262,node').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/\│.+engine262.+\│/.test(result.stdout));
+        assert(/\│.+node.+\│/.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for a specific tag', () => {
+      return eshost('--table test/bin/fixtures/module.mjs --tags latest').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/\│.+engine262.+\│/.test(result.stdout));
+        assert(!/\│.+node.+\│/.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for specific tags', () => {
+      return eshost('--table test/bin/fixtures/module.mjs --tags latest,greatest').then(result => {
+        assert.equal(result.stderr, '');
+        assert(/engine262/.test(result.stdout));
+        assert(!/\│.+node.+\│/.test(result.stdout));
+      });
+    });
+  });
+});

@@ -2,15 +2,18 @@
 'use strict';
 
 const fs = require('fs');
-const esh = require('eshost');
-const yargs = require('yargs');
-const Config = require('../lib/config')
-const Path = require('path');
-const chalk = require('chalk');
+const path = require('path');
+const readline = require('readline');
 
-const hostManager = require('../lib/host-manager') ;
+const chalk = require('chalk');
+const esh = require('eshost');
 const Table = require('cli-table');
+const uniqueTempDir = require('unique-temp-dir');
+const yargs = require('yargs');
+
+const Config = require('../lib/config')
 const DefaultReporter = require('../lib/reporters/default');
+const hostManager = require('../lib/host-manager') ;
 const TableReporter = require('../lib/reporters/table');
 
 const usage = `
@@ -53,6 +56,13 @@ const yargv = yargs
   .describe('async', 'wait for realm destruction before reporting results')
   .boolean('async')
   .alias('a', 'async')
+  .describe('module', 'evaluate expression as module code')
+  .boolean('module')
+  .alias('m', 'module')
+  .describe('raw', 'evaluate raw code, with no runtime helpers')
+  .boolean('raw')
+  .alias('r', 'raw')
+  .default('r', false, '"raw" defaults to "false"')
   .boolean('l', 'list hosts')
   .alias('l', 'list')
   .describe('add', 'add a host')
@@ -87,11 +97,11 @@ const yargv = yargs
   .example('eshost -h ch-1.?.? test.js')
   .example('eshost --tags latest test.js')
   .example('eshost --unanimous test.js')
-  .fail(function (msg, err) {
-    if (err) {
-      console.error(err.stack);
+  .fail((msg, error) => {
+    if (error) {
+      console.error(error.stack);
     } else {
-      console.error(msg);
+      console.log(msg);
     }
     process.exit(1);
   });
@@ -238,61 +248,113 @@ if (argv['configure-jsvu']) {
   hostManager.configureJsvu(config, argv['jsvu-root'], argv['jsvu-prefix']);
 }
 
-const file = argv._[0];
+let fileArg = argv._[0];
+const raw = argv.raw;
+const attrs = {
+  flags: {
+    raw,
+  }
+};
 
 process.stdin.setEncoding('utf8');
 
-if (file) {
+if (fileArg) {
+  const file = path.join(process.cwd(), fileArg);
   const contents = fs.readFileSync(file, 'utf8');
-  runInEachHost(contents, hosts);
-} else if (argv.e) {
-  runInEachHost(`print(${argv.e})`, hosts);
-} else if (argv.x) {
-  runInEachHost(argv.x, hosts);
-} else {
-  let script = '';
-
-  // check for stdin
-  process.stdin.on('readable', function() {
-    const chunk = process.stdin.read();
-
-    if (chunk === null && script === '') {
-      yargv.showHelp();
-      process.exit(1);
-    } else if (chunk !== null) {
-      script += chunk;
+  const attrs = {
+    flags: {
+      raw: true,
+      module: file.endsWith('.mjs') || argv.module
     }
-  });
+  };
+  runInEachHost({file, contents, attrs}, hosts);
+} else {
+  const file = path.join(uniqueTempDir(), generateTempFileName());
+  const dirname = path.dirname(file);
 
-  process.stdin.on('end', function () {
-    runInEachHost(script, hosts);
-  });
+  try {
+    fs.statSync(dirname);
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      try {
+        fs.mkdirSync(dirname);
+      } catch ({}) {
+        // suppressed?
+      }
+    }
+  }
+
+  if (argv.e) {
+    let contents = `print(${argv.e})`;
+    fs.writeFileSync(file, contents);
+    runInEachHost({file, contents, attrs}, hosts);
+  } else if (argv.x) {
+    let contents = argv.x;
+    fs.writeFileSync(file, contents);
+    runInEachHost({file, contents, attrs}, hosts);
+  } else {
+    let contents = '';
+
+    console.log('(Press <ctrl>-D to execute)');
+
+    let rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+
+    rl.prompt();
+
+    rl.on('line', line => {
+      line = line.trim();
+
+      if (line === '' && contents === '') {
+        yargv.showHelp();
+        process.exit(1);
+      } else {
+        contents += `${line}\n`;
+      }
+    });
+
+    rl.on('close', async () => {
+      fs.writeFileSync(file, contents);
+      await runInEachHost({file, contents, attrs}, hosts);
+    });
+  }
 }
 
-function runInHost(host, code) {
+async function runInHost(testable, host) {
   let runner;
-  return esh.createAgent(host.type, { hostArguments: host.args, hostPath: host.path })
+  await esh.createAgent(host.type, { hostArguments: host.args, hostPath: host.path })
   .then(r => {
     runner = r;
-    return runner.evalScript(code, { async: argv.async });
+    return runner.evalScript(testable, {
+      async: argv.async || (testable.attrs && testable.attrs.flags && testable.attrs.flags.module),
+      module: argv.module || (testable.attrs && testable.attrs.flags && testable.attrs.flags.module)
+    });
   })
-  .then(function (result) {
+  .then(result => {
     reporter.result(host, result);
     return runner.destroy();
   })
   .catch(e => {
-    console.error(chalk.red('Failure attempting to eval script in agent: ' + e.stack));
-  })
+    console.error(chalk.red(`Failure attempting to eval script in agent: ${e.stack}`));
+  });
 }
 
-function runInEachHost(code, hosts) {
-  reporter.start(code);
-  let promises = hosts.map(name => {
-    const host = config.hosts[name];
-    host.name = name;
+async function runInEachHost(testable, hosts) {
+  reporter.start(testable.contents);
 
-    return runInHost(host, code);
-  });
+  await Promise.all(
+    hosts.map(name => {
+      const host = config.hosts[name];
+      host.name = name;
+      return runInHost(testable, host);
+    })
+  ).then(() => reporter.end());
+}
 
-  Promise.all(promises).then(() => reporter.end());
+
+function generateTempFileName() {
+  const now = Date.now();
+  return `f-${now}-${process.pid}-${(Math.random() * 0x100000000 + 1).toString(36)}.js`;
 }

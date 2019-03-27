@@ -1,26 +1,36 @@
 ---
 language: node_js
-node_js: "6"
+node_js:
+  - 10
+  - 11
 dist: trusty
 sudo: false
 install: |
-    # Install SpiderMonkey (js/jsshell)
-    export TMP=$(mktemp);
-    wget https://archive.mozilla.org/pub/firefox/nightly/latest-mozilla-central/jsshell-linux-x86_64.zip -O $TMP;
-    mkdir jsshell;
-    unzip -d jsshell $TMP;
-    rm $TMP;
-    unset TMP;
-    export PATH=$PATH:$(pwd)/jsshell;
 
-    # Install ChakraCore (ch/ch)
-    wget https://s3.amazonaws.com/eshost-builds/ChakraCore-Debug_linux_1_7_0.tar.gz;
-    tar -xvf ChakraCore-Debug_linux_1_7_0.tar.gz;
-    export PATH=$PATH:$(pwd)/out/Debug;
+  # Install engine262 (engine262/engine262)
+  git clone https://github.com/devsnek/engine262.git;
+  cd engine262 && npm install && npm run build && npm link;
+  cd $TRAVIS_BUILD_DIR;
 
-    which js;
-    which ch;
+  # Install SpiderMonkey (js/jsshell)
+  export TMP=$(mktemp);
+  wget https://archive.mozilla.org/pub/firefox/nightly/latest-mozilla-central/jsshell-linux-x86_64.zip -O $TMP;
+  mkdir jsshell;
+  unzip -d jsshell $TMP;
+  rm $TMP;
+  unset TMP;
+  export PATH=$PATH:$(pwd)/jsshell;
 
-    npm install;
+  # Install ChakraCore (ch/ch)
+  wget https://s3.amazonaws.com/eshost-builds/ChakraCore-Debug_linux_1_7_0.tar.gz;
+  tar -xvf ChakraCore-Debug_linux_1_7_0.tar.gz;
+  export PATH=$PATH:$(pwd)/out/Debug;
 
-script: npm test
+  which engine262;
+  which js;
+  which ch;
+
+  npm install --ignore-scripts;
+
+script:
+  - npm run test;
