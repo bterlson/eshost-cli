@@ -4,6 +4,7 @@ const assert = require('assert');
 const cp = require('child_process');
 const fs = require('fs');
 const path = require('path');
+
 const tokenize = require('yargs/lib/tokenize-arg-string');
 
 const Config = require('../../lib/config');
@@ -155,7 +156,7 @@ describe('eshost --add', () => {
     return eshost('--add ch ch /path/to/ch').then(result => {
       assert.equal(result.stderr, '');
       assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
-      assert(result.stdout.includes('Host \'ch\' added'));
+      assert(result.stdout.includes('Host "ch" added'));
     });
   });
 
@@ -163,7 +164,7 @@ describe('eshost --add', () => {
     return eshost('--add invalid invalid /path/to/invalid').then(result => {
       assert.equal(result.stderr, '');
       assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
-      assert(result.stdout.includes('Host type \'invalid\' not supported'));
+      assert(result.stdout.includes('Host type "invalid" not supported'));
     });
   });
 
@@ -172,7 +173,7 @@ describe('eshost --add', () => {
     return eshost(add).then(result => {
       assert.equal(result.stderr, '');
 
-      if (result.stdout.includes('Host \'ch\' added')) {
+      if (result.stdout.includes('Host "ch" added')) {
         return eshost('--list').then(result => {
           assert.equal(result.stderr, '');
           /*
@@ -191,7 +192,7 @@ describe('eshost --add', () => {
     return eshost(add).then(result => {
       assert.equal(result.stderr, '');
 
-      if (result.stdout.includes('Host \'ch\' added')) {
+      if (result.stdout.includes('Host "ch" added')) {
         return eshost('--list').then(result => {
           assert.equal(result.stderr, '');
           /*
@@ -210,7 +211,7 @@ describe('eshost --add', () => {
     return eshost(add).then(result => {
       assert.equal(result.stderr, '');
 
-      if (result.stdout.includes('Host \'ch\' added')) {
+      if (result.stdout.includes('Host "ch" added')) {
         return eshost('--list').then(result => {
           assert.equal(result.stderr, '');
           /*
@@ -243,7 +244,7 @@ describe('eshost --delete', () => {
     return eshost('--delete ch').then(result => {
       assert.equal(result.stderr, '');
       assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
-      assert(result.stdout.includes('Host \'ch\' deleted'));
+      assert(result.stdout.includes('Host "ch" deleted'));
     });
   });
 });

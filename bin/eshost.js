@@ -4,14 +4,14 @@
 const fs = require('fs');
 const esh = require('eshost');
 const yargs = require('yargs');
-const Config = require('../lib/config.js')
+const Config = require('../lib/config')
 const Path = require('path');
 const chalk = require('chalk');
 
-const hostManager = require('../lib/host-manager.js') ;
+const hostManager = require('../lib/host-manager') ;
 const Table = require('cli-table');
-const DefaultReporter = require('../lib/reporters/default.js');
-const TableReporter = require('../lib/reporters/table.js');
+const DefaultReporter = require('../lib/reporters/default');
+const TableReporter = require('../lib/reporters/table');
 
 const usage = `
 Usage: eshost [options] [input-file]
@@ -210,14 +210,14 @@ if (argv.list) {
 // add a host
 if (argv.add) {
   hostManager.add(config, argv.add[0], argv.add[1], argv._[0], argv.args, hostTags);
-  console.log(`Host '${argv.add[0]}' added`);
+  console.log(`Host "${argv.add[0]}" added`);
   process.exit(0);
 }
 
 // edit a host
 if (argv.edit) {
   hostManager.edit(config, argv.edit, argv.args, hostTags);
-  console.log(`Host '${argv.edit}' edited`);
+  console.log(`Host "${argv.edit}" edited`);
   process.exit(0);
 }
 
@@ -230,7 +230,7 @@ if (argv.args) {
 // delete a host
 if (argv.delete) {
   hostManager.delete(config, argv.delete);
-  console.log(`Host '${argv.delete}' deleted`);
+  console.log(`Host "${argv.delete}" deleted`);
   process.exit(0);
 }
 
