@@ -61,17 +61,27 @@ You can `--list`, `--add`, `--edit`, and `--delete` hosts. Adding a host require
 
 Console hosts are either provided by the browser vendors or, more likely, built from source. [The `jsvu` CLI](https://github.com/GoogleChromeLabs/jsvu) makes it easy to install and update the most common JavaScript engine binaries.
 
-Host types are [those provided by eshost](https://github.com/bterlson/eshost#supported-hosts), namely:
+Host types are [those provided by eshost](https://github.com/bterlson/eshost#eshostcreateagenttype-string-options---agent), namely:
 
-* `ch`
-* `d8`
-* `engine262`
-* `jsshell`
-* `jsc`
-* `nashorn`
-* `node`
-* `xs`
-* `chrome`
-* `edge`
-* `firefox`
-* `safari`
+Shells: 
+
+| Host Type | All Acceptable Values |
+| ---- | -------------------- |
+| ChakraCore | `chakra`, `ch` |
+| Engine262 | `engine262` |
+| JavaScriptCore | `javascriptcore`, `jsc` |
+| Nashorn | `nashorn` |
+| Node | `node` |
+| SpiderMonkey | `jsshell`, `spidermonkey`, `sm` |
+| V8 | `d8`, `v8` |
+| XS | `xs` |
+
+Browsers: 
+
+| Host Type | All Acceptable Values |
+| ---- | -------------------- |
+| chrome | `chrome` |
+| edge | `edge` |
+| firefox | `firefox` |
+| safari | `safari` |
+
