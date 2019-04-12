@@ -120,7 +120,7 @@ describe('eshost --list', () => {
   it('displays "No configured hosts" when no hosts are configured', () => {
     return eshost('--list').then(result => {
       assert.equal(result.stderr, '');
-      assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert(result.stdout.startsWith(`Using config "${Config.defaultConfigPath}"`));
       assert(result.stdout.includes('No configured hosts'));
     });
   });
@@ -140,7 +140,7 @@ describe('eshost --list', () => {
       /*
       │ js   │ jsshell │ /path/to/js │      │      │
       */
-      assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert(result.stdout.startsWith(`Using config "${Config.defaultConfigPath}"`));
       assert(/\bjs\b/m.test(result.stdout));
       assert(/\bjsshell\b/m.test(result.stdout));
       assert(result.stdout.includes(toHostPath('jsshell')));
@@ -168,7 +168,7 @@ describe('eshost --list', () => {
       ├──────┼─────────┼─────────────┼──────┼──────┤
       │ ch   │ ch      │ /path/to/ch │      │      │
       */
-      assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert(result.stdout.startsWith(`Using config "${Config.defaultConfigPath}"`));
       assert(/\bjs\b/m.test(result.stdout));
       assert(/\bjsshell\b/m.test(result.stdout));
       assert(result.stdout.includes(toHostPath('jsshell')));
@@ -182,7 +182,7 @@ describe('eshost --add', () => {
   it('allows adding a valid host', () => {
     return eshost('--add ch ch /path/to/ch').then(result => {
       assert.equal(result.stderr, '');
-      assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert(result.stdout.startsWith(`Using config "${Config.defaultConfigPath}"`));
       assert(result.stdout.includes('Host "ch" added'));
     });
   });
@@ -190,7 +190,7 @@ describe('eshost --add', () => {
   it('disallows adding an invalid host', () => {
     return eshost('--add invalid invalid /path/to/invalid').then(result => {
       assert.equal(result.stderr, '');
-      assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert(result.stdout.startsWith(`Using config "${Config.defaultConfigPath}"`));
       assert(result.stdout.includes('Host type "invalid" not supported'));
     });
   });
@@ -270,7 +270,7 @@ describe('eshost --delete', () => {
 
     return eshost('--delete ch').then(result => {
       assert.equal(result.stderr, '');
-      assert(result.stdout.startsWith(`Using config  ${Config.defaultConfigPath}`));
+      assert(result.stdout.startsWith(`Using config "${Config.defaultConfigPath}"`));
       assert(result.stdout.includes('Host "ch" deleted'));
     });
   });
