@@ -22,6 +22,69 @@ See `--help` output for the full details. Basic usage:
   - `eshost -mx "foo = 42; print(foo);"` (this example should result in errors!)
 * Execute a source file as module code by saving the file with an `.mjs` extension: `eshost file.mjs`; or by using the `-m` option: `eshost -m file.js`
 
+### Install and Configure Hosts
+
+On Linux and macOS: 
+
+```
+git clone https://github.com/devsnek/engine262.git;
+cd engine262 && npm install && npm run build && npm link;
+cd ~/
+
+npm install -g jsvu;
+export PATH="${HOME}/.jsvu:${PATH}";
+
+jsvu --engines=all;
+
+export ESHOST_PATH_CHAKRA=`which chakra`;
+export ESHOST_PATH_ENGINE262=`which engine262`;
+export ESHOST_PATH_JAVASCRIPTCORE=`which javascriptcore`;
+export ESHOST_PATH_SPIDERMONKEY=`which spidermonkey`;
+export ESHOST_PATH_V8=`which v8`;
+export ESHOST_PATH_XS=`which xs`;
+
+npm install -g eshost;
+
+eshost --add "chakra" ch $ESHOST_PATH_CHAKRA;
+eshost --add "engine262" engine262 $ESHOST_PATH_ENGINE262;
+eshost --add "javascriptcore" jsc $ESHOST_PATH_JAVASCRIPTCORE;
+eshost --add "spidermonkey" jsshell $ESHOST_PATH_SPIDERMONKEY;
+eshost --add "v8" d8 $ESHOST_PATH_V8;
+eshost --add "xs" xs $ESHOST_PATH_XS;
+```
+
+On Windows: 
+
+```
+git clone https://github.com/devsnek/engine262.git
+cd .\engine262
+npm install
+npm run build
+npm link
+set NPM_GLOBAL_MODULE_PATH=%APPDATA%\npm\
+set PATH=%PATH;%NPM_GLOBAL_MODULE_PATH%
+where engine262
+
+npm install jsvu
+
+jsvu --os=win64 --engines="chakra,spidermonkey,v8,xs"
+
+set PATH=%PATH;%USERPROFILE%\.jsvu\
+set ESHOST_CHAKRA=%USERPROFILE%\.jsvu\chakra.cmd
+set ESHOST_ENGINE262=%NPM_GLOBAL_MODULE_PATH%\engine262.cmd
+set ESHOST_SPIDERMONKEY=%USERPROFILE%\.jsvu\spidermonkey.cmd
+set ESHOST_V8=%USERPROFILE%\.jsvu\v8.cmd
+set ESHOST_XS=%USERPROFILE%\.jsvu\xs.cmd
+
+npm install -g eshost;
+
+eshost --add "chakra" ch %ESHOST_CHAKRA%
+eshost --add "engine262" engine262 %ESHOST_ENGINE262%
+eshost --add "spidermonkey" jsshell %ESHOST_SPIDERMONKEY%
+eshost --add "v8" d8 %ESHOST_V8%
+eshost --add "xs" xs %ESHOST_XS%
+```
+
 ### Examples
 
 ```
@@ -29,22 +92,22 @@ $ npm install -g eshost-cli
 $ eshost --help
 $ eshost --add <name> <type> <path to host executable> --args <optional arguments>
 $ eshost -e "Map.length"
-#### Chakra
+#### chakra
 0
 
 #### engine262
 0
 
-#### JavaScriptCore
+#### javascriptcore
 0
 
-#### SpiderMonkey
+#### spidermonkey
 0
 
-#### V8
+#### v8
 0
 
-#### XS
+#### xs
 0
 ```
 
@@ -75,20 +138,20 @@ Files containing the imported modules must be located in the same directory that
   echo "export var a = 1;" >> export.mjs
   echo "import {a} from './export.mjs'; print(a);" >> import.mjs
 
-  eshost --host="engine262,JavaScriptCore,SpiderMonkey,V8,XS" import.mjs
+  eshost --host="engine262,javascriptcore,spidermonkey,v8,xs" import.mjs
   #### engine262
   1
 
-  #### JavaScriptCore
+  #### javascriptcore
   1
 
-  #### SpiderMonkey
+  #### spidermonkey
   1
 
-  #### V8
+  #### v8
   1
 
-  #### XS
+  #### xs
   1
   ```
 
@@ -101,20 +164,20 @@ Files containing the imported modules must be located in the same directory that
   echo "export var a = 1;" >> export.mjs
   echo "import {a} from './export.mjs'; print(a);" >> import.js
 
-  eshost --host="engine262,JavaScriptCore,SpiderMonkey,V8,XS" -m import.js
+  eshost --host="engine262,javascriptcore,spidermonkey,v8,xs" -m import.js
   #### engine262
   1
 
-  #### JavaScriptCore
+  #### javascriptcore
   1
 
-  #### SpiderMonkey
+  #### spidermonkey
   1
 
-  #### V8
+  #### v8
   1
 
-  #### XS
+  #### xs
   1
   ```
 
