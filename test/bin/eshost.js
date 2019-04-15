@@ -475,7 +475,7 @@ describe('eshost [input-file]', () => {
     }));
   });
 
-  describe('script', () => {
+  describe('script.js', () => {
     it('evaluates code and displays the result for all hosts', () => {
       return eshost('test/bin/fixtures/script.js').then(result => {
         assert.equal(result.stderr, '');
