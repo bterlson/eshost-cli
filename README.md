@@ -132,54 +132,53 @@ Files containing the imported modules must be located in the same directory that
 
 1. Executing a program with module dependencies, where the entry point is a ".mjs" file: 
 
-  ```
-  mkdir entry-point-mjs;
-  cd entry-point-mjs;
-  echo "export var a = 1;" >> export.mjs
-  echo "import {a} from './export.mjs'; print(a);" >> import.mjs
+    ```
+    mkdir entry-point-mjs;
+    cd entry-point-mjs;
+    echo "export var a = 1;" >> export.mjs
+    echo "import {a} from './export.mjs'; print(a);" >> import.mjs
 
-  eshost --host="engine262,javascriptcore,spidermonkey,v8,xs" import.mjs
-  #### engine262
-  1
+    eshost --host="engine262,javascriptcore,spidermonkey,v8,xs" import.mjs
+    #### engine262
+    1
 
-  #### javascriptcore
-  1
+    #### javascriptcore
+    1
 
-  #### spidermonkey
-  1
+    #### spidermonkey
+    1
 
-  #### v8
-  1
+    #### v8
+    1
 
-  #### xs
-  1
-  ```
+    #### xs
+    1
+    ```
 
-2. Executing a program with module dependencies, where the entry point is a ".js" file: 
-  
-  (Notice the use of the `-m` flag, **this is required for ".js" files**)
-  ```
-  mkdir entry-point-js;
-  cd entry-point-js;
-  echo "export var a = 1;" >> export.mjs
-  echo "import {a} from './export.mjs'; print(a);" >> import.js
+2. Executing a program with module dependencies, where the entry point is a ".js" file (Notice the use of the `-m` flag, **this is required for ".js" files**): 
 
-  eshost --host="engine262,javascriptcore,spidermonkey,v8,xs" -m import.js
-  #### engine262
-  1
+    ```
+    mkdir entry-point-js;
+    cd entry-point-js;
+    echo "export var a = 1;" >> export.mjs
+    echo "import {a} from './export.mjs'; print(a);" >> import.js
 
-  #### javascriptcore
-  1
+    eshost --host="engine262,javascriptcore,spidermonkey,v8,xs" -m import.js
+    #### engine262
+    1
 
-  #### spidermonkey
-  1
+    #### javascriptcore
+    1
 
-  #### v8
-  1
+    #### spidermonkey
+    1
 
-  #### xs
-  1
-  ```
+    #### v8
+    1
+
+    #### xs
+    1
+    ```
 
 **Executing a multi-line program with module dependencies is not yet supported. Support is in progress.**
 
