@@ -1,4 +1,8 @@
-## eshost-cli
+# eshost-cli
+
+[![Travis Build Status](https://travis-ci.org/bterlson/eshost-cli.svg?branch=master)](https://travis-ci.org/bterlson/eshost-cli)
+[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/github/bterlson/eshost-cli?branch=master&svg=true)](https://ci.appveyor.com/project/bterlson/eshost-cli)
+
 
 eshost-cli makes it easy to run and compare ECMAScript code uniformly across a number of runtimes. Support for runtimes is provided by the library [eshost](https://github.com/bterlson/eshost). Every host is initialized with the [eshost runtime API](https://github.com/bterlson/eshost#runtime-library) available which provides a uniform way to print, create realms, and eval code. 
 
