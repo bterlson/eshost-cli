@@ -9,7 +9,7 @@
     "chalk": "^1.1.1",
     "cli-table": "^0.3.1",
     "configstore": "^1.4.0",
-    "eshost": "^6.4.0",
+    "eshost": "^6.5.0",
     "nconf": "^0.8.2",
     "temp": "^0.8.3",
     "unique-temp-dir": "^1.0.0",
