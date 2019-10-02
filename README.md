@@ -193,7 +193,7 @@ Host types are [those provided by eshost](https://github.com/bterlson/eshost#esh
 
 Shells: 
 
-| Host Type | All Acceptable Values |
+| Host Type | All Acceptable `type` Values |
 | ---- | -------------------- |
 | ChakraCore | `chakra`, `ch` |
 | Engine262 | `engine262` |
@@ -211,7 +211,7 @@ Shells:
 
 Browsers: 
 
-| Host Type | All Acceptable Values |
+| Host Type | All Acceptable `type` Values |
 | ---- | -------------------- |
 | chrome | `chrome` |
 | edge | `edge` |
