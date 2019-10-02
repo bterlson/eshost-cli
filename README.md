@@ -200,13 +200,14 @@ Shells:
 | JavaScriptCore | `javascriptcore`, `jsc` |
 | Nashorn | `nashorn` |
 | Node | `node` |
-| QuickJS | `qjs` <sup>1</sup> |
+| QuickJS | `qjs` <sup>1</sup><sup>2</sup> |
 | SpiderMonkey | `jsshell`, `spidermonkey`, `sm` |
 | V8 | `d8`, `v8` |
 | XS | `xs` |
 
-* 1: For the QuickJS, use `run-test26`, eg. `eshost --add QuickJS qjs path/to/quickjs/run-test262`
+* 1: For QuickJS, use `run-test26`, eg. `eshost --add QuickJS qjs path/to/quickjs/run-test262`
     - Users can download the QuickJS source [here](https://bellard.org/quickjs/). Extract the contents and enter the directory. Run `make` to build from source. Create a symlink to `run-test262` and use that to set up a runtime: `eshost --add QuickJS qjs symlink/to/quickjs/run-test262`
+* 2: **DO NOT USE `~/.jsvu/quickjs` WITH ESHOST-CLI**. The main `quickjs` binary does not support the [eshost runtime API](https://github.com/bterlson/eshost#runtime-library). See <sup>1</sup>.
 
 Browsers: 
 
