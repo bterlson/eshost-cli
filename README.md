@@ -205,7 +205,8 @@ Shells:
 | V8 | `d8`, `v8` |
 | XS | `xs` |
 
-* 1: For the QuickJS, use `run-test26`, eg. `eshost --add qjs qjs path/to/quickjs/run-test262`
+* 1: For the QuickJS, use `run-test26`, eg. `eshost --add QuickJS qjs path/to/quickjs/run-test262`
+    - Users can download the QuickJS source [here](https://bellard.org/quickjs/). Extract the contents and enter the directory. Run `make` to build from source. Create a symlink to `run-test262` and use that to set up a runtime: `eshost --add QuickJS qjs symlink/to/quickjs/run-test262`
 
 Browsers: 
 
