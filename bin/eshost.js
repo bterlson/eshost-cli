@@ -324,19 +324,26 @@ if (fileArg) {
 
 async function runInHost(testable, host) {
   let runner;
-  await esh.createAgent(host.type, { hostArguments: host.args, hostPath: host.path })
-  .then(r => {
+  const {
+    args: hostArguments,
+    path: hostPath,
+    type: hostType,
+  } = host;
+  const shortName = '$262';
+  await esh.createAgent(hostType, {
+    hostArguments,
+    hostPath,
+    shortName,
+  }).then(r => {
     runner = r;
     return runner.evalScript(testable, {
       async: argv.async || (testable.attrs && testable.attrs.flags && testable.attrs.flags.module),
       module: argv.module || (testable.attrs && testable.attrs.flags && testable.attrs.flags.module)
     });
-  })
-  .then(result => {
+  }).then(result => {
     reporter.result(host, result);
     return runner.destroy();
-  })
-  .catch(e => {
+  }).catch(e => {
     console.error(chalk.red(`Failure attempting to eval script in agent: ${e.stack}`));
   });
 }
