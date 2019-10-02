@@ -200,7 +200,7 @@ Shells:
 | JavaScriptCore | `javascriptcore`, `jsc` |
 | Nashorn | `nashorn` |
 | Node | `node` |
-| QuickJS | `qjs` <sup>1</sup><sup>2</sup> |
+| QuickJS | `qjs` <sup>1</sup>, <sup>2</sup> |
 | SpiderMonkey | `jsshell`, `spidermonkey`, `sm` |
 | V8 | `d8`, `v8` |
 | XS | `xs` |
