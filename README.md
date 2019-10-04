@@ -27,18 +27,27 @@ See `--help` output for the full details. Basic usage:
 On Linux and macOS: 
 
 ```
+# Engine262
 git clone https://github.com/devsnek/engine262.git;
 cd engine262 && npm install && npm run build && npm link;
 cd ~/
 
+# QuickJS
+wget https://bellard.org/quickjs/quickjs-2019-09-18.tar.xz;
+tar -xf quickjs-2019-09-18.tar.xz;
+cd quickjs-2019-09-18 && make;
+if [ -f "$PWD/run-test262" ]; then ln -s $PWD/run-test262 /usr/local/bin/qjs-for-eshost; fi;
+
+# Everything else...
 npm install -g jsvu;
 export PATH="${HOME}/.jsvu:${PATH}";
 
-jsvu --engines=all;
+jsvu --engines=chakra,hermes,javascriptcore,spidermonkey,v8,xs
 
 export ESHOST_PATH_CHAKRA=`which chakra`;
 export ESHOST_PATH_ENGINE262=`which engine262`;
 export ESHOST_PATH_JAVASCRIPTCORE=`which javascriptcore`;
+export ESHOST_PATH_QUICKJS=`which qjs-for-eshost`;
 export ESHOST_PATH_SPIDERMONKEY=`which spidermonkey`;
 export ESHOST_PATH_V8=`which v8`;
 export ESHOST_PATH_XS=`which xs`;
@@ -48,6 +57,7 @@ npm install -g eshost;
 eshost --add "chakra" ch $ESHOST_PATH_CHAKRA;
 eshost --add "engine262" engine262 $ESHOST_PATH_ENGINE262;
 eshost --add "javascriptcore" jsc $ESHOST_PATH_JAVASCRIPTCORE;
+eshost --add "quickjs" qjs $ESHOST_PATH_QUICKJS;
 eshost --add "spidermonkey" jsshell $ESHOST_PATH_SPIDERMONKEY;
 eshost --add "v8" d8 $ESHOST_PATH_V8;
 eshost --add "xs" xs $ESHOST_PATH_XS;
@@ -191,7 +201,7 @@ Console hosts are either provided by the browser vendors or, more likely, built 
 
 Host types are [those provided by eshost](https://github.com/bterlson/eshost#eshostcreateagenttype-string-options---agent), namely:
 
-Shells: 
+### Shells
 
 | Host Type | All Acceptable `type` Values |
 | ---- | -------------------- |
@@ -200,16 +210,14 @@ Shells:
 | JavaScriptCore | `javascriptcore`, `jsc` |
 | Nashorn | `nashorn` |
 | Node | `node` |
-| QuickJS | `qjs` <sup>1</sup>, <sup>2</sup> |
+| QuickJS | `qjs` <sup>1</sup> |
 | SpiderMonkey | `jsshell`, `spidermonkey`, `sm` |
 | V8 | `d8`, `v8` |
 | XS | `xs` |
 
-* 1: For QuickJS, use `run-test26`, eg. `eshost --add QuickJS qjs path/to/quickjs/run-test262`
-    - Users can download the QuickJS source [here](https://bellard.org/quickjs/). Extract the contents and enter the directory. Run `make` to build from source. Create a symlink to `run-test262` and use that to set up a runtime: `eshost --add QuickJS qjs symlink/to/quickjs/run-test262`
-* 2: **DO NOT USE `~/.jsvu/quickjs` WITH ESHOST-CLI**. The main `quickjs` binary does not support the [eshost runtime API](https://github.com/bterlson/eshost#runtime-library). See <sup>1</sup>.
+* 1: **DO NOT USE `~/.jsvu/quickjs` WITH ESHOST-CLI**. The main `quickjs` binary does not support the [eshost runtime API](https://github.com/bterlson/eshost#runtime-library). For more, see [Install and Configure Hosts](#install-and-configure-hosts).
 
-Browsers: 
+### Browsers
 
 | Host Type | All Acceptable `type` Values |
 | ---- | -------------------- |
