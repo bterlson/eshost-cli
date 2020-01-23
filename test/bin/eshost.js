@@ -404,10 +404,6 @@ describe('eshost --unanimous --eval', () => {
   beforeEach(() => {
     fs.writeFileSync(Config.defaultConfigPath, JSON.stringify({
       hosts: {
-        node: {
-          type: 'node',
-          path: toHostPath('node'),
-        },
         ch: {
           type: 'ch',
           path: toHostPath('ch'),
@@ -429,10 +425,12 @@ describe('eshost --unanimous --eval', () => {
     });
 
     it('displays results when results are varied', () => {
+      // Using "gc" because that's guaranteed to be present in jsshell by default
+      // and guaranteed to be absent from chakra by default.
       return eshost('--unanimous --eval "typeof gc"').then(result => {
         assert.equal(result.stderr, '');
         assert(/#### js\nfunction/.test(result.stdout));
-        assert(/#### ch, node\nundefined/.test(result.stdout));
+        assert(/#### ch\nundefined/.test(result.stdout));
       });
     });
   });
@@ -446,6 +444,8 @@ describe('eshost --unanimous --eval', () => {
     });
 
     it('displays results when results are varied', () => {
+      // Using "gc" because that's guaranteed to be present in jsshell by default
+      // and guaranteed to be absent from chakra by default.
       return eshost('--unanimous --table --eval "typeof gc"').then(result => {
         assert.equal(result.stderr, '');
         assert(/\│.+ch.+undefined.+\│/.test(result.stdout));
