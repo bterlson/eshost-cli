@@ -13,6 +13,7 @@ See eshost's [supported hosts](https://github.com/bterlson/eshost#supported-host
 See `--help` output for the full details. Basic usage:
 
 * Add hosts using `eshost --add <host name> <host type> <host path> --args <optional arguments>`.
+* Automatically configure [`esvu`](https://github.com/devsnek/esvu)-installed hosts using `eshost --configure-esvu`.
 * Automatically configure [`jsvu`](https://github.com/GoogleChromeLabs/jsvu)-installed hosts using `eshost --configure-jsvu`.
 * Evaluate a *single* expression using `-e`: `eshost -e "[1,2,3].length"`.
 * Execute a multi-statement program using `-x`: `eshost -x "foo = 42; print(foo);"`
@@ -24,28 +25,19 @@ See `--help` output for the full details. Basic usage:
 
 ### Install and Configure Hosts
 
-On Linux and macOS: 
+#### Linux and macOS
+
+Manually, using `esvu`:
 
 ```
-# Engine262
-git clone https://github.com/devsnek/engine262.git;
-cd engine262 && npm install && npm run build && npm link;
-cd ~/
+npm install esvu -g;
+export PATH="${HOME}/.jsvu/bin:${PATH}";
 
-# QuickJS
-wget https://bellard.org/quickjs/quickjs-2019-09-18.tar.xz;
-tar -xf quickjs-2019-09-18.tar.xz;
-cd quickjs-2019-09-18 && make;
-if [ -f "$PWD/run-test262" ]; then ln -s $PWD/run-test262 /usr/local/bin/qjs-for-eshost; fi;
-
-# Everything else...
-npm install -g jsvu;
-export PATH="${HOME}/.jsvu:${PATH}";
-
-jsvu --engines=chakra,hermes,javascriptcore,spidermonkey,v8,xs
+esvu --engines=all;
 
 export ESHOST_PATH_CHAKRA=`which chakra`;
 export ESHOST_PATH_ENGINE262=`which engine262`;
+export ESHOST_PATH_HERMES=`which hermes`;
 export ESHOST_PATH_JAVASCRIPTCORE=`which javascriptcore`;
 export ESHOST_PATH_QUICKJS=`which qjs-for-eshost`;
 export ESHOST_PATH_SPIDERMONKEY=`which spidermonkey`;
@@ -56,6 +48,7 @@ npm install -g eshost;
 
 eshost --add "chakra" ch $ESHOST_PATH_CHAKRA;
 eshost --add "engine262" engine262 $ESHOST_PATH_ENGINE262;
+eshost --add "hermes" hermes $ESHOST_PATH_HERMES;
 eshost --add "javascriptcore" jsc $ESHOST_PATH_JAVASCRIPTCORE;
 eshost --add "quickjs" qjs $ESHOST_PATH_QUICKJS;
 eshost --add "spidermonkey" jsshell $ESHOST_PATH_SPIDERMONKEY;
@@ -63,7 +56,55 @@ eshost --add "v8" d8 $ESHOST_PATH_V8;
 eshost --add "xs" xs $ESHOST_PATH_XS;
 ```
 
-On Windows: 
+Manually, using `jsvu`: 
+
+```
+# Engine262
+git clone https://github.com/devsnek/engine262.git;
+cd engine262 && npm install && npm run build && npm link;
+cd ~/
+
+# Everything else...
+npm install -g jsvu;
+export PATH="${HOME}/.jsvu:${PATH}";
+
+jsvu --engines=chakra,hermes,javascriptcore,spidermonkey,v8,xs
+
+export ESHOST_PATH_CHAKRA=`which chakra`;
+export ESHOST_PATH_ENGINE262=`which engine262`;
+export ESHOST_PATH_HERMES=`which hermes`;
+export ESHOST_PATH_JAVASCRIPTCORE=`which javascriptcore`;
+export ESHOST_PATH_QUICKJS=`which qjs-for-eshost`;
+export ESHOST_PATH_SPIDERMONKEY=`which spidermonkey`;
+export ESHOST_PATH_V8=`which v8`;
+export ESHOST_PATH_XS=`which xs`;
+
+npm install -g eshost;
+
+eshost --add "chakra" ch $ESHOST_PATH_CHAKRA;
+eshost --add "engine262" engine262 $ESHOST_PATH_ENGINE262;
+eshost --add "hermes" hermes $ESHOST_PATH_HERMES;
+eshost --add "javascriptcore" jsc $ESHOST_PATH_JAVASCRIPTCORE;
+eshost --add "quickjs" qjs $ESHOST_PATH_QUICKJS;
+eshost --add "spidermonkey" jsshell $ESHOST_PATH_SPIDERMONKEY;
+eshost --add "v8" d8 $ESHOST_PATH_V8;
+eshost --add "xs" xs $ESHOST_PATH_XS;
+```
+
+##### This will install QuickJS on macOS
+
+```
+if [ "$(uname)" == "Darwin" ]; then wget https://bellard.org/quickjs/quickjs-2020-01-19.tar.xz; tar -xf quickjs-2020-01-19.tar.xz;
+cd quickjs-2020-01-19 && make; if [ -f "$PWD/run-test262" ]; then ln -s $PWD/run-test262 /usr/local/bin/qjs-for-eshost; fi; fi;
+```
+
+
+
+#### Windows
+
+
+
+Manually, using `jsvu`: 
 
 ```
 git clone https://github.com/devsnek/engine262.git
@@ -119,6 +160,22 @@ $ eshost -e "Map.length"
 
 #### xs
 0
+```
+
+
+```
+$ eshost --configure-esvu --esvu-prefix esvu
+$ eshost --tags esvu-web -itsx "let a = 40+2; print(a)"
+
+## Source
+let a = 40+2; print(a)
+
+┌──────────┬────┐
+│ esvu-ch  │ 42 │
+│ esvu-jsc │    │
+│ esvu-sm  │    │
+│ esvu-v8  │    │
+└──────────┴────┘
 ```
 
 ```

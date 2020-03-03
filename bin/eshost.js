@@ -2,6 +2,7 @@
 'use strict';
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const readline = require('readline');
 
@@ -71,8 +72,15 @@ const yargv = yargs
   .nargs('edit', 1)
   .describe('delete', 'delete a host')
   .nargs('delete', 1)
+  .describe('delete-all', 'delete all hosts')
   .describe('args', 'set arguments for a host entry (use with --add)')
   .nargs('args', 1)
+  .describe('configure-esvu', 'Configure esvu hosts in the config')
+  .boolean('configure-esvu')
+  .describe('esvu-prefix', '[OPTIONAL] Set the prefix of the configured hosts. If prefix is "esvu" then hosts will be configured as, e.g., "esvu-sm". By default, no prefix (e.g. "sm"). Use this flag with --configure-esvu.')
+  .nargs('esvu-prefix', 1)
+  .describe('esvu-root', '[OPTIONAL] Use this path containing the .esvu folder (use this option if .esvu is located somewhere other than the home directory). Use this flag with --configure-esvu.')
+  .nargs('esvu-root', 1)
   .describe('configure-jsvu', 'Configure jsvu hosts in the config')
   .boolean('configure-jsvu')
   .describe('jsvu-prefix', '[OPTIONAL] Set the prefix of the configured hosts. If prefix is "jsvu" then hosts will be configured as, e.g., "jsvu-sm". By default, no prefix (e.g. "sm"). Use this flag with --configure-jsvu.')
@@ -84,6 +92,8 @@ const yargv = yargs
   .example('eshost --add d8 d8 path/to/d8 --args "--harmony"')
   .example('eshost --add ch ch path/to/ch --tags latest')
   .example('eshost --add ch ch path/to/ch --tags latest,greatest')
+  .example('eshost --configure-esvu')
+  .example('eshost --configure-esvu --esvu-prefix esvu')
   .example('eshost --configure-jsvu')
   .example('eshost --configure-jsvu --jsvu-prefix jsvu')
   .example('eshost test.js')
@@ -119,6 +129,8 @@ if (argv.c) {
 } else {
   config = Config.defaultConfig();
 }
+
+console.log(chalk.grey(`Using config "${config.configPath}"`));
 
 let hosts = [];
 if (Array.isArray(argv.h)) {
@@ -244,8 +256,21 @@ if (argv.delete) {
   process.exit(0);
 }
 
-if (argv['configure-jsvu']) {
-  hostManager.configureJsvu(config, argv['jsvu-root'], argv['jsvu-prefix']);
+// delete all hosts
+if (argv['delete-all']) {
+  hostManager.delete(config);
+  process.exit(0);
+}
+
+if (argv['configure-esvu'] || argv['configure-jsvu']) {
+  const vu = argv['configure-esvu']
+    ? 'esvu'
+    : 'jsvu';
+  const vuRoot = path.join(argv[`${vu}-root`] || os.homedir(), `.${vu}`);
+  const vuPrefix = argv[`${vu}-prefix`] || '';
+  hostManager.configureFromVersionUpdater(config, vu, vuRoot, vuPrefix);
+  hostManager.list(config);
+  process.exit(0);
 }
 
 let fileArg = argv._[0];
