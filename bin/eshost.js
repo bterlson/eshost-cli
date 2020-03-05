@@ -221,16 +221,16 @@ if (argv.table) {
   reporter = new DefaultReporter(reporterOptions);
 }
 
+if (argv.list || argv.add || argv.edit || argv.delete ||
+    argv['delete-all'] || argv['configure-esvu'] || argv['configure-jsvu']) {
+  console.log(chalk.grey(`Using config "${config.configPath}"`));
+}
 // list available hosts
 if (argv.list) {
   hostManager.list(config);
   process.exit(0);
 }
 
-if (argv.add || argv.edit || argv.delete ||
-    argv['delete-all'] || argv['configure-esvu'] || argv['configure-jsvu']) {
-  console.log(chalk.grey(`Using config "${config.configPath}"`));
-}
 
 // add a host
 if (argv.add) {
