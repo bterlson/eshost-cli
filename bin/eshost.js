@@ -130,8 +130,6 @@ if (argv.c) {
   config = Config.defaultConfig();
 }
 
-console.log(chalk.grey(`Using config "${config.configPath}"`));
-
 let hosts = [];
 if (Array.isArray(argv.h)) {
   hosts = argv.h;
@@ -227,6 +225,11 @@ if (argv.table) {
 if (argv.list) {
   hostManager.list(config);
   process.exit(0);
+}
+
+if (argv.add || argv.edit || argv.delete ||
+    argv['delete-all'] || argv['configure-esvu'] || argv['configure-jsvu']) {
+  console.log(chalk.grey(`Using config "${config.configPath}"`));
 }
 
 // add a host
