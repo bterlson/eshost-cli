@@ -44,7 +44,7 @@ export ESHOST_PATH_SPIDERMONKEY=`which spidermonkey`;
 export ESHOST_PATH_V8=`which v8`;
 export ESHOST_PATH_XS=`which xs`;
 
-npm install -g eshost;
+npm install -g eshost-cli;
 
 eshost --add "chakra" ch $ESHOST_PATH_CHAKRA;
 eshost --add "engine262" engine262 $ESHOST_PATH_ENGINE262;
@@ -79,7 +79,7 @@ export ESHOST_PATH_SPIDERMONKEY=`which spidermonkey`;
 export ESHOST_PATH_V8=`which v8`;
 export ESHOST_PATH_XS=`which xs`;
 
-npm install -g eshost;
+npm install -g eshost-cli;
 
 eshost --add "chakra" ch $ESHOST_PATH_CHAKRA;
 eshost --add "engine262" engine262 $ESHOST_PATH_ENGINE262;
@@ -127,7 +127,7 @@ set ESHOST_SPIDERMONKEY=%USERPROFILE%\.jsvu\spidermonkey.cmd
 set ESHOST_V8=%USERPROFILE%\.jsvu\v8.cmd
 set ESHOST_XS=%USERPROFILE%\.jsvu\xs.cmd
 
-npm install -g eshost;
+npm install -g eshost-cli;
 
 eshost --add "chakra" ch %ESHOST_CHAKRA%
 eshost --add "engine262" engine262 %ESHOST_ENGINE262%
