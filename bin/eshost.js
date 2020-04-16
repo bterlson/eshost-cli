@@ -8,7 +8,6 @@ const readline = require('readline');
 
 const chalk = require('chalk');
 const esh = require('eshost');
-const Table = require('cli-table');
 const uniqueTempDir = require('unique-temp-dir');
 const yargs = require('yargs');
 
@@ -44,6 +43,8 @@ const yargv = yargs
   .describe('table', 'output in a table')
   .boolean('table')
   .alias('table', 't')
+  .describe('markdown', 'output as markdown')
+  .boolean('markdown')
   .describe('coalesce', 'coalesce like output into a single entry')
   .boolean('coalesce')
   .alias('coalesce', 's')
@@ -211,7 +212,8 @@ hosts = [ ... new Set(hosts) ]; // take unique elements
 let reporterOptions = {
   coalesce: argv.coalesce,
   showSource: argv.showSource,
-  unanimous: argv.unanimous
+  unanimous: argv.unanimous,
+  markdown: argv.markdown
 };
 
 let reporter;
@@ -227,7 +229,7 @@ if (argv.list || argv.add || argv.edit || argv.delete ||
 }
 // list available hosts
 if (argv.list) {
-  hostManager.list(config);
+  hostManager.list(config, argv);
   process.exit(0);
 }
 

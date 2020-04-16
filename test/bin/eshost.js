@@ -361,32 +361,32 @@ describe('eshost --eval', () => {
     it('evaluates code and displays the result for all hosts', () => {
       return eshost('--table --eval " 1 + 1 "').then(result => {
         assert.equal(result.stderr, '');
-        assert(/\│.+ch.+2.+\│/.test(result.stdout));
-        assert(/\│.+node.+2.+\│/.test(result.stdout));
+        assert(/\║.+ch.+2.+\║/.test(result.stdout));
+        assert(/\║.+node.+2.+\║/.test(result.stdout));
       });
     });
 
     it('evaluates code and displays the result for a specific host', () => {
       return eshost('--table --eval " 1 + 1 " --host ch').then(result => {
         assert.equal(result.stderr, '');
-        assert(/\│.+ch.+2.+\│/.test(result.stdout));
-        assert(!/\│.+node.+2.+\│/.test(result.stdout));
+        assert(/\║.+ch.+2.+\║/.test(result.stdout));
+        assert(!/\║.+node.+2.+\║/.test(result.stdout));
       });
     });
 
     it('evaluates code and displays the result for a specific host group', () => {
       return eshost('--table --eval " 1 + 1 " --hostGroup ch,node').then(result => {
         assert.equal(result.stderr, '');
-        assert(/\│.+ch.+2.+\│/.test(result.stdout));
-        assert(/\│.+node.+2.+\│/.test(result.stdout));
+        assert(/\║.+ch.+2.+\║/.test(result.stdout));
+        assert(/\║.+node.+2.+\║/.test(result.stdout));
       });
     });
 
     it('evaluates code and displays the result for a specific tag', () => {
       return eshost('--table --eval " 1 + 1 " --tags latest').then(result => {
         assert.equal(result.stderr, '');
-        assert(/\│.+ch.+2.+\│/.test(result.stdout));
-        assert(!/\│.+node.+2.+\│/.test(result.stdout));
+        assert(/\║.+ch.+2.+\║/.test(result.stdout));
+        assert(!/\║.+node.+2.+\║/.test(result.stdout));
       });
     });
 
@@ -394,7 +394,7 @@ describe('eshost --eval', () => {
       return eshost('--table --eval " 1 + 1 " --tags latest,greatest').then(result => {
         assert.equal(result.stderr, '');
         assert(/ch/.test(result.stdout));
-        assert(!/\│.+node.+2.+\│/.test(result.stdout));
+        assert(!/\║.+node.+2.+\║/.test(result.stdout));
       });
     });
   });
@@ -448,8 +448,8 @@ describe('eshost --unanimous --eval', () => {
       // and guaranteed to be absent from chakra by default.
       return eshost('--unanimous --table --eval "typeof gc"').then(result => {
         assert.equal(result.stderr, '');
-        assert(/\│.+ch.+undefined.+\│/.test(result.stdout));
-        assert(/\│.+js.+function.+\│/.test(result.stdout));
+        assert(/\║.+ch.+undefined.+\║/.test(result.stdout));
+        assert(/\║.+js.+function.+\║/.test(result.stdout));
       });
     });
   });
@@ -596,24 +596,24 @@ describe('eshost [input-file]', () => {
     it('evaluates code and displays the result for all hosts', () => {
       return eshost('--table test/bin/fixtures/module.mjs').then(result => {
         assert.equal(result.stderr, '');
-        assert(/\│.+engine262.+\│/.test(result.stdout));
-        assert(/\│.+node.+\│/.test(result.stdout));
+        assert(/\║.+engine262.+\║/.test(result.stdout));
+        assert(/\║.+node.+\║/.test(result.stdout));
       });
     });
 
     it('evaluates code and displays the result for a specific host group', () => {
       return eshost('--table test/bin/fixtures/module.mjs --hostGroup engine262,node').then(result => {
         assert.equal(result.stderr, '');
-        assert(/\│.+engine262.+\│/.test(result.stdout));
-        assert(/\│.+node.+\│/.test(result.stdout));
+        assert(/\║.+engine262.+\║/.test(result.stdout));
+        assert(/\║.+node.+\║/.test(result.stdout));
       });
     });
 
     it('evaluates code and displays the result for a specific tag', () => {
       return eshost('--table test/bin/fixtures/module.mjs --tags latest').then(result => {
         assert.equal(result.stderr, '');
-        assert(/\│.+engine262.+\│/.test(result.stdout));
-        assert(!/\│.+node.+\│/.test(result.stdout));
+        assert(/\║.+engine262.+\║/.test(result.stdout));
+        assert(!/\║.+node.+\║/.test(result.stdout));
       });
     });
 
@@ -621,7 +621,7 @@ describe('eshost [input-file]', () => {
       return eshost('--table test/bin/fixtures/module.mjs --tags latest,greatest').then(result => {
         assert.equal(result.stderr, '');
         assert(/engine262/.test(result.stdout));
-        assert(!/\│.+node.+\│/.test(result.stdout));
+        assert(!/\║.+node.+\║/.test(result.stdout));
       });
     });
   });
