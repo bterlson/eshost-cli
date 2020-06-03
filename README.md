@@ -29,7 +29,7 @@ See `--help` output for the full details. Basic usage:
 
 Manually, using `esvu`:
 
-```
+```sh
 npm install esvu -g;
 export PATH="${HOME}/.jsvu/bin:${PATH}";
 
@@ -58,7 +58,7 @@ eshost --add "xs" xs $ESHOST_PATH_XS;
 
 Manually, using `jsvu`: 
 
-```
+```sh
 # Engine262
 git clone https://github.com/devsnek/engine262.git;
 cd engine262 && npm install && npm run build && npm link;
@@ -93,7 +93,7 @@ eshost --add "xs" xs $ESHOST_PATH_XS;
 
 ##### This will install QuickJS on macOS
 
-```
+```sh
 if [ "$(uname)" == "Darwin" ]; then wget https://bellard.org/quickjs/quickjs-2020-01-19.tar.xz; tar -xf quickjs-2020-01-19.tar.xz;
 cd quickjs-2020-01-19 && make; if [ -f "$PWD/run-test262" ]; then ln -s $PWD/run-test262 /usr/local/bin/qjs-for-eshost; fi; fi;
 ```
@@ -106,7 +106,7 @@ cd quickjs-2020-01-19 && make; if [ -f "$PWD/run-test262" ]; then ln -s $PWD/run
 
 Manually, using `jsvu`: 
 
-```
+```batch
 git clone https://github.com/devsnek/engine262.git
 cd .\engine262
 npm install
@@ -138,7 +138,7 @@ eshost --add "xs" xs %ESHOST_XS%
 
 ### Examples
 
-```
+```console
 $ npm install -g eshost-cli
 $ eshost --help
 $ eshost --add <name> <type> <path to host executable> --args <optional arguments>
@@ -163,7 +163,7 @@ $ eshost -e "Map.length"
 ```
 
 
-```
+```console
 $ eshost --configure-esvu --esvu-prefix esvu
 $ eshost --tags esvu-web -itsx "let a = 40+2; print(a)"
 
@@ -178,7 +178,7 @@ let a = 40+2; print(a)
 └──────────┴────┘
 ```
 
-```
+```console
 $ eshost --configure-jsvu --jsvu-prefix jsvu
 $ eshost --tags jsvu-web -itsx "let a = 40+2; print(a)"
 
@@ -199,7 +199,7 @@ Files containing the imported modules must be located in the same directory that
 
 1. Executing a program with module dependencies, where the entry point is a ".mjs" file: 
 
-    ```
+    ```sh
     mkdir entry-point-mjs;
     cd entry-point-mjs;
     echo "export var a = 1;" >> export.mjs
@@ -224,7 +224,7 @@ Files containing the imported modules must be located in the same directory that
 
 2. Executing a program with module dependencies, where the entry point is a ".js" file (Notice the use of the `-m` flag, **this is required for ".js" files**): 
 
-    ```
+    ```sh
     mkdir entry-point-js;
     cd entry-point-js;
     echo "export var a = 1;" >> export.mjs
@@ -282,4 +282,3 @@ Host types are [those provided by eshost](https://github.com/bterlson/eshost#esh
 | edge | `edge` |
 | firefox | `firefox` |
 | safari | `safari` |
-
