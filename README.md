@@ -94,7 +94,7 @@ eshost --add "xs" xs $ESHOST_PATH_XS;
 ##### This will install QuickJS on macOS
 
 ```sh
-if [ "$(uname)" == "Darwin" ]; then wget https://bellard.org/quickjs/quickjs-2020-01-19.tar.xz; tar -xf quickjs-2020-01-19.tar.xz;
+if [ "$(uname)" = Darwin ]; then wget https://bellard.org/quickjs/quickjs-2020-01-19.tar.xz; tar -xf quickjs-2020-01-19.tar.xz;
 cd quickjs-2020-01-19 && make; if [ -f "$PWD/run-test262" ]; then ln -s $PWD/run-test262 /usr/local/bin/qjs-for-eshost; fi; fi;
 ```
 
