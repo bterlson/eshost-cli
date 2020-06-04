@@ -12,45 +12,27 @@ const Config = require('../../lib/config');
 // To avoid messing with a real configuration, use a test-local config
 Config.defaultConfigPath = path.join(__dirname, '../config/.eshost-config.json');
 
-const isWindows = process.platform === 'win32' ||
-  process.env.OSTYPE === 'cygwin' ||
-  process.env.OSTYPE === 'msys';
+console.log("Engines installed");
+console.log("--------------------------------------------------------");
+console.log(process.env.ESHOST_ESVU_PATH);
+console.log(process.env.ESHOST_CHAKRA_PATH);
+console.log(process.env.ESHOST_ENGINE262_PATH);
+console.log(process.env.ESHOST_JSC_PATH);
+console.log(process.env.ESHOST_JS_PATH);
+console.log(process.env.ESHOST_NODE_PATH);
+console.log(process.env.ESHOST_V8_PATH);
+console.log(process.env.ESHOST_XS_PATH);
+console.log("--------------------------------------------------------");
 
 const hosts = [
-  ['ch', { hostPath: 'ch' }],
-  ['d8', { hostPath: 'd8' }],
-  ['engine262', { hostPath: 'engine262' }],
-  ['jsshell', { hostPath: 'js' }],
-  ['jsc', { hostPath: 'jsc' }],
-  ['node', { hostPath: 'node' }],
+  ['chakra', { hostPath: process.env.ESHOST_CHAKRA_PATH }],
+  ['engine262', { hostPath: process.env.ESHOST_ENGINE262_PATH }],
+  ['jsc', { hostPath: process.env.ESHOST_JSC_PATH }],
+  ['sm', { hostPath: process.env.ESHOST_JS_PATH }],
+  ['node', { hostPath: process.env.ESHOST_NODE_PATH }],
+  ['v8', { hostPath: process.env.ESHOST_V8_PATH }],
+  ['xs', { hostPath: process.env.ESHOST_XS_PATH }],
 ];
-
-const hostsOnWindows = [
-  ['ch', { hostPath: 'ch.exe' }],
-  ['d8', { hostPath: 'd8.exe' }],
-  // engine262 is intentionally NOT given an ".exe" extension!
-  ['engine262', { hostPath: 'engine262.cmd' }],
-  ['jsshell', { hostPath: 'js.exe' }],
-  ['jsc', { hostPath: 'jsc.exe' }],
-  ['node', { hostPath: 'node.exe' }],
-];
-
-if (isWindows) {
-  hosts.forEach((record, index) => {
-    const host = hostsOnWindows[index];
-    if (record[1].hostPath) {
-      if (record[0] === host[0]) {
-        record[1].hostPath = host[1].hostPath;
-      }
-      const ESHOST_ENV_NAME = `ESHOST_${record[0].toUpperCase()}_PATH`;
-      console.log(`ESHOST_ENV_NAME: ${ESHOST_ENV_NAME}`);
-      if (process.env[ESHOST_ENV_NAME]) {
-        record[1].hostPath = path.join(process.env[ESHOST_ENV_NAME], record[1].hostPath);
-        console.log(record[1].hostPath);
-      }
-    }
-  });
-}
 
 const hostsByType = hosts.reduce((accum, [type, config]) => {
   accum[type] = config;
@@ -129,8 +111,8 @@ describe('eshost --list', () => {
     fs.writeFileSync(Config.defaultConfigPath, JSON.stringify({
       hosts: {
         js: {
-          type: 'jsshell',
-          path: toHostPath('jsshell')
+          type: 'sm',
+          path: toHostPath('sm')
         }
       }
     }));
@@ -138,12 +120,12 @@ describe('eshost --list', () => {
     return eshost('--list').then(result => {
       assert.equal(result.stderr, '');
       /*
-      │ js   │ jsshell │ /path/to/js │      │      │
+      │ js   │ sm │ /path/to/js │      │      │
       */
       assert(result.stdout.startsWith(`Using config "${Config.defaultConfigPath}"`));
       assert(/\bjs\b/m.test(result.stdout));
-      assert(/\bjsshell\b/m.test(result.stdout));
-      assert(result.stdout.includes(toHostPath('jsshell')));
+      assert(/\bsm\b/m.test(result.stdout));
+      assert(result.stdout.includes(toHostPath('sm')));
     });
   });
 
@@ -151,12 +133,12 @@ describe('eshost --list', () => {
     fs.writeFileSync(Config.defaultConfigPath, JSON.stringify({
       hosts: {
         js: {
-          type: 'jsshell',
-          path: toHostPath('jsshell')
+          type: 'sm',
+          path: toHostPath('sm')
         },
-        ch: {
-          type: 'ch',
-          path: toHostPath('ch')
+        node: {
+          type: 'node',
+          path: toHostPath('node')
         }
       }
     }));
@@ -164,26 +146,26 @@ describe('eshost --list', () => {
     return eshost('--list').then(result => {
       assert.equal(result.stderr, '');
       /*
-      │ js   │ jsshell │ /path/to/js │      │      │
-      ├──────┼─────────┼─────────────┼──────┼──────┤
-      │ ch   │ ch      │ /path/to/ch │      │      │
+      │ js   │ sm │ /path/to/js   │      │      │
+      ├──────┼─────────┼───────────────┼──────┼──────┤
+      │ node │ node    │ /path/to/node │      │      │
       */
       assert(result.stdout.startsWith(`Using config "${Config.defaultConfigPath}"`));
       assert(/\bjs\b/m.test(result.stdout));
-      assert(/\bjsshell\b/m.test(result.stdout));
-      assert(result.stdout.includes(toHostPath('jsshell')));
-      assert(/\bch\b/m.test(result.stdout));
-      assert(result.stdout.includes(toHostPath('ch')));
+      assert(/\bsm\b/m.test(result.stdout));
+      assert(result.stdout.includes(toHostPath('sm')));
+      assert(/\bnode\b/m.test(result.stdout));
+      assert(result.stdout.includes(toHostPath('node')));
     });
   });
 });
 
 describe('eshost --add', () => {
   it('allows adding a valid host', () => {
-    return eshost('--add ch ch /path/to/ch').then(result => {
+    return eshost('--add node node /path/to/node').then(result => {
       assert.equal(result.stderr, '');
       assert(result.stdout.startsWith(`Using config "${Config.defaultConfigPath}"`));
-      assert(result.stdout.includes('Host "ch" added'));
+      assert(result.stdout.includes('Host "node" added'));
     });
   });
 
@@ -258,20 +240,20 @@ describe('eshost --delete', () => {
     fs.writeFileSync(Config.defaultConfigPath, JSON.stringify({
       hosts: {
         js: {
-          type: 'jsshell',
-          path: toHostPath('jsshell')
+          type: 'sm',
+          path: toHostPath('sm')
         },
-        ch: {
-          type: 'ch',
-          path: toHostPath('ch')
+        node: {
+          type: 'node',
+          path: toHostPath('node')
         }
       }
     }));
 
-    return eshost('--delete ch').then(result => {
+    return eshost('--delete node').then(result => {
       assert.equal(result.stderr, '');
       assert(result.stdout.startsWith(`Using config "${Config.defaultConfigPath}"`));
-      assert(result.stdout.includes('Host "ch" deleted'));
+      assert(result.stdout.includes('Host "node" deleted'));
     });
   });
 });
@@ -285,9 +267,9 @@ describe('eshost --eval', () => {
           path: toHostPath('node'),
           args: '--harmony'
         },
-        ch: {
-          type: 'ch',
-          path: toHostPath('ch'),
+        v8: {
+          type: 'v8',
+          path: toHostPath('v8'),
           tags: [
             'latest',
             'greatest'
@@ -301,23 +283,23 @@ describe('eshost --eval', () => {
     it('evaluates code and displays the result for all hosts', () => {
       return eshost('--eval " 1 + 1 "').then(result => {
         assert.equal(result.stderr, '');
-        assert(/#### ch\n2/m.test(result.stdout));
+        assert(/#### v8\n2/m.test(result.stdout));
         assert(/#### node\n2/m.test(result.stdout));
       });
     });
 
     it('evaluates code and displays the result for a specific host', () => {
-      return eshost('--eval " 1 + 1 " --host ch').then(result => {
+      return eshost('--eval " 1 + 1 " --host v8').then(result => {
         assert.equal(result.stderr, '');
-        assert(/#### ch\n2/m.test(result.stdout));
+        assert(/#### v8\n2/m.test(result.stdout));
         assert(!/#### node\n2/m.test(result.stdout));
       });
     });
 
     it('evaluates code and displays the result for a specific host group', () => {
-      return eshost('--eval " 1 + 1 " --hostGroup ch,node').then(result => {
+      return eshost('--eval " 1 + 1 " --hostGroup v8,node').then(result => {
         assert.equal(result.stderr, '');
-        assert(/#### ch\n2/m.test(result.stdout));
+        assert(/#### v8\n2/m.test(result.stdout));
         assert(/#### node\n2/m.test(result.stdout));
       });
     });
@@ -325,7 +307,7 @@ describe('eshost --eval', () => {
     it('evaluates code and displays the result for a specific tag', () => {
       return eshost('--eval " 1 + 1 " --tags latest').then(result => {
         assert.equal(result.stderr, '');
-        assert(/#### ch\n2/m.test(result.stdout));
+        assert(/#### v8\n2/m.test(result.stdout));
         assert(!/#### node\n2/m.test(result.stdout));
       });
     });
@@ -333,7 +315,7 @@ describe('eshost --eval', () => {
     it('evaluates code and displays the result for specific tags', () => {
       return eshost('--eval " 1 + 1 " --tags latest,greatest').then(result => {
         assert.equal(result.stderr, '');
-        assert(/#### ch\n2/m.test(result.stdout));
+        assert(/#### v8\n2/m.test(result.stdout));
         assert(!/#### node\n2/m.test(result.stdout));
       });
     });
@@ -341,17 +323,17 @@ describe('eshost --eval', () => {
 
   describe('(deduping)', () => {
     it('dedupes hosts, for a specific host list', () => {
-      return eshost('--eval " 1 + 1 " --host ch,ch,node,node').then(result => {
+      return eshost('--eval " 1 + 1 " --host v8,v8,node,node').then(result => {
         assert.equal(result.stderr, '');
-        assert.equal(result.stdout.match(/#### ch\n2/gm).length, 1);
+        assert.equal(result.stdout.match(/#### v8\n2/gm).length, 1);
         assert.equal(result.stdout.match(/#### node\n2/gm).length, 1);
       });
     });
 
     it('dedupes hosts, for a specific host group list', () => {
-      return eshost('--eval " 1 + 1 " --hostGroup ch,ch,node,node').then(result => {
+      return eshost('--eval " 1 + 1 " --hostGroup v8,v8,node,node').then(result => {
         assert.equal(result.stderr, '');
-        assert.equal(result.stdout.match(/#### ch\n2/gm).length, 1);
+        assert.equal(result.stdout.match(/#### v8\n2/gm).length, 1);
         assert.equal(result.stdout.match(/#### node\n2/gm).length, 1);
       });
     });
@@ -361,23 +343,23 @@ describe('eshost --eval', () => {
     it('evaluates code and displays the result for all hosts', () => {
       return eshost('--table --eval " 1 + 1 "').then(result => {
         assert.equal(result.stderr, '');
-        assert(/\│.+ch.+2.+\│/.test(result.stdout));
+        assert(/\│.+v8.+2.+\│/.test(result.stdout));
         assert(/\│.+node.+2.+\│/.test(result.stdout));
       });
     });
 
     it('evaluates code and displays the result for a specific host', () => {
-      return eshost('--table --eval " 1 + 1 " --host ch').then(result => {
+      return eshost('--table --eval " 1 + 1 " --host v8').then(result => {
         assert.equal(result.stderr, '');
-        assert(/\│.+ch.+2.+\│/.test(result.stdout));
+        assert(/\│.+v8.+2.+\│/.test(result.stdout));
         assert(!/\│.+node.+2.+\│/.test(result.stdout));
       });
     });
 
     it('evaluates code and displays the result for a specific host group', () => {
-      return eshost('--table --eval " 1 + 1 " --hostGroup ch,node').then(result => {
+      return eshost('--table --eval " 1 + 1 " --hostGroup v8,node').then(result => {
         assert.equal(result.stderr, '');
-        assert(/\│.+ch.+2.+\│/.test(result.stdout));
+        assert(/\│.+v8.+2.+\│/.test(result.stdout));
         assert(/\│.+node.+2.+\│/.test(result.stdout));
       });
     });
@@ -385,7 +367,7 @@ describe('eshost --eval', () => {
     it('evaluates code and displays the result for a specific tag', () => {
       return eshost('--table --eval " 1 + 1 " --tags latest').then(result => {
         assert.equal(result.stderr, '');
-        assert(/\│.+ch.+2.+\│/.test(result.stdout));
+        assert(/\│.+v8.+2.+\│/.test(result.stdout));
         assert(!/\│.+node.+2.+\│/.test(result.stdout));
       });
     });
@@ -393,7 +375,7 @@ describe('eshost --eval', () => {
     it('evaluates code and displays the result for specific tags', () => {
       return eshost('--table --eval " 1 + 1 " --tags latest,greatest').then(result => {
         assert.equal(result.stderr, '');
-        assert(/ch/.test(result.stdout));
+        assert(/v8/.test(result.stdout));
         assert(!/\│.+node.+2.+\│/.test(result.stdout));
       });
     });
@@ -405,12 +387,12 @@ describe('eshost --unanimous --eval', () => {
     fs.writeFileSync(Config.defaultConfigPath, JSON.stringify({
       hosts: {
         ch: {
-          type: 'ch',
-          path: toHostPath('ch'),
+          type: 'chakra',
+          path: toHostPath('chakra'),
         },
         js: {
-          type: 'jsshell',
-          path: toHostPath('jsshell'),
+          type: 'sm',
+          path: toHostPath('sm'),
         }
       }
     }));
@@ -425,7 +407,7 @@ describe('eshost --unanimous --eval', () => {
     });
 
     it('displays results when results are varied', () => {
-      // Using "gc" because that's guaranteed to be present in jsshell by default
+      // Using "gc" because that's guaranteed to be present in sm by default
       // and guaranteed to be absent from chakra by default.
       return eshost('--unanimous --eval "typeof gc"').then(result => {
         assert.equal(result.stderr, '');
@@ -444,12 +426,12 @@ describe('eshost --unanimous --eval', () => {
     });
 
     it('displays results when results are varied', () => {
-      // Using "gc" because that's guaranteed to be present in jsshell by default
+      // Using "gc" because that's guaranteed to be present in sm by default
       // and guaranteed to be absent from chakra by default.
       return eshost('--unanimous --table --eval "typeof gc"').then(result => {
         assert.equal(result.stderr, '');
-        assert(/\│.+ch.+undefined.+\│/.test(result.stdout));
-        assert(/\│.+js.+function.+\│/.test(result.stdout));
+        assert(/ch.+undefined/.test(result.stdout));
+        assert(/js.+function/.test(result.stdout));
       });
     });
   });

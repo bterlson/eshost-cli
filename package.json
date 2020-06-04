@@ -19,7 +19,8 @@
     "mocha": "^3.5.0"
   },
   "scripts": {
-    "test": "mocha test/bin/eshost.js"
+    "build:env": "./scripts/prepare-environment.sh",
+    "test": "export $(./scripts/prepare-environment.sh); mocha test/bin/eshost.js"
   },
   "repository": {
     "type": "git",

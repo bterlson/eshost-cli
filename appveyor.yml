@@ -11,47 +11,47 @@ platform:
   - x64
   - x86
 
-install:
-  - ps: Install-Product node $env:nodejs_version
-  - set ESHOST_PATH=%CD%
-  - mkdir hosts
-  # Engine262: Clone, Build, Link and set PATH
-  - mkdir engine262
-  - git clone https://github.com/devsnek/engine262.git engine262
-  - cd %CD%\engine262
-  - npm install
-  - npm run build
-  - npm link
-  - set ESHOST_ENGINE262_PATH=C:\Users\appveyor\AppData\Roaming\npm\
-  - set PATH=%PATH%;C:\Users\appveyor\AppData\Roaming\npm\
-  - where engine262
-  - cd %ESHOST_PATH%\hosts
-  # SpiderMonkey: Curl, Unzip and set PATH
-  - mkdir spidermonkey
-  - curl -fsS -o spidermonkey\jsshell-win64.zip https://archive.mozilla.org/pub/firefox/nightly/latest-mozilla-central/jsshell-win64.zip
-  - 7z e -o%CD%\spidermonkey spidermonkey\jsshell-win64.zip
-  - set PATH=%PATH%;%CD%\spidermonkey\
-  - set ESHOST_JSSHELL_PATH=%CD%\spidermonkey\
-  - where js
-  # ChakraCore: Clone, Build and set PATH
-  - mkdir chakracore
-  - git clone https://github.com/Microsoft/ChakraCore.git chakracore
-  - msbuild /p:Platform=%PLATFORM% /p:Configuration=Debug %CD%\chakracore\Build\Chakra.Core.sln
-  - set PATH=%PATH%;%CD%\chakracore\Build\VcBuild\bin\%PLATFORM%_debug
-  - cd %CD%\chakracore\Build\VcBuild\bin\%PLATFORM%_debug
-  - where ch
-  # Return to eshost dir
-  - cd %ESHOST_PATH%
-  - where node
-  - echo %PATH%
-  - node -v
-  - npm install -g npm
-  - npm install
+# install:
+#   - ps: Install-Product node $env:nodejs_version
+#   - set ESHOST_PATH=%CD%
+#   - mkdir hosts
+#   # Engine262: Clone, Build, Link and set PATH
+#   - mkdir engine262
+#   - git clone https://github.com/devsnek/engine262.git engine262
+#   - cd %CD%\engine262
+#   - npm install
+#   - npm run build
+#   - npm link
+#   - set ESHOST_ENGINE262_PATH=C:\Users\appveyor\AppData\Roaming\npm\
+#   - set PATH=%PATH%;C:\Users\appveyor\AppData\Roaming\npm\
+#   - where engine262
+#   - cd %ESHOST_PATH%\hosts
+#   # SpiderMonkey: Curl, Unzip and set PATH
+#   - mkdir spidermonkey
+#   - curl -fsS -o spidermonkey\jsshell-win64.zip https://archive.mozilla.org/pub/firefox/nightly/latest-mozilla-central/jsshell-win64.zip
+#   - 7z e -o%CD%\spidermonkey spidermonkey\jsshell-win64.zip
+#   - set PATH=%PATH%;%CD%\spidermonkey\
+#   - set ESHOST_JSSHELL_PATH=%CD%\spidermonkey\
+#   - where js
+#   # ChakraCore: Clone, Build and set PATH
+#   - mkdir chakracore
+#   - git clone https://github.com/Microsoft/ChakraCore.git chakracore
+#   - msbuild /p:Platform=%PLATFORM% /p:Configuration=Debug %CD%\chakracore\Build\Chakra.Core.sln
+#   - set PATH=%PATH%;%CD%\chakracore\Build\VcBuild\bin\%PLATFORM%_debug
+#   - cd %CD%\chakracore\Build\VcBuild\bin\%PLATFORM%_debug
+#   - where ch
+#   # Return to eshost dir
+#   - cd %ESHOST_PATH%
+#   - where node
+#   - echo %PATH%
+#   - node -v
+#   - npm install -g npm
+#   - npm install
 
 build: off
 
-test_script:
-  - cmd: npm test
+# test_script:
+#   - cmd: npm test
 
 matrix:
   fast_finish: true
