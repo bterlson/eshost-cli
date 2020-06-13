@@ -31,7 +31,7 @@ Manually, using `esvu`:
 
 ```sh
 npm install esvu -g;
-export PATH="${HOME}/.jsvu/bin:${PATH}";
+export PATH="${HOME}/.esvu/bin:${PATH}";
 
 esvu --engines=all;
 
