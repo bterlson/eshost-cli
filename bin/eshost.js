@@ -291,7 +291,7 @@ if (fileArg) {
   const contents = fs.readFileSync(file, 'utf8');
   const attrs = {
     flags: {
-      raw: true,
+      raw,
       module: file.endsWith('.mjs') || argv.module
     }
   };
