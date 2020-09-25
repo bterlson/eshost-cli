@@ -6,7 +6,8 @@
     "eshost": "bin/eshost.js"
   },
   "dependencies": {
-    "chalk": "^1.1.1",
+    "ansi-styles": "^4.2.1",
+    "chalk": "^4.1.0",
     "cli-table": "^0.3.1",
     "configstore": "^1.4.0",
     "eshost": "^7.5.2",

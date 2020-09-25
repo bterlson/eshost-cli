@@ -8,6 +8,7 @@ const readline = require('readline');
 
 const chalk = require('chalk');
 const esh = require('eshost');
+const styles = require('ansi-styles');
 const Table = require('cli-table');
 const uniqueTempDir = require('unique-temp-dir');
 const yargs = require('yargs');
@@ -47,6 +48,9 @@ const yargv = yargs
   .describe('coalesce', 'coalesce like output into a single entry')
   .boolean('coalesce')
   .alias('coalesce', 's')
+  .describe('color', 'specify the color to use in output, eg. --color.error red --color.header blue')
+  .describe('no-color', 'do not colorize output')
+  .boolean('no-color')
   .describe('showSource', 'show input source')
   .boolean('showSource')
   .alias('showSource', 'i')
@@ -210,9 +214,22 @@ hosts = [ ... new Set(hosts) ]; // take unique elements
 
 let reporterOptions = {
   coalesce: argv.coalesce,
+  color: { error: 'magentaBright', header: 'grey', ...(argv.color || {}) },
   showSource: argv.showSource,
   unanimous: argv.unanimous
 };
+
+if (argv.noColors) {
+  reporterOptions.color = false;
+}
+
+let invalidColor = Object.values(reporterOptions.color).find(color => !styles[color]);
+
+if (invalidColor) {
+  console.log(`Invalid color or style: "${invalidColor}"\n`);
+  console.log(`Choose from:\n${Object.keys(styles).map(style => `- ${style}\n`).join('')}`);
+  process.exit(1);
+}
 
 let reporter;
 if (argv.table) {
@@ -222,8 +239,11 @@ if (argv.table) {
 }
 
 if (argv.list || argv.add || argv.edit || argv.delete ||
-    argv['delete-all'] || argv['configure-esvu'] || argv['configure-jsvu']) {
-  console.log(chalk.grey(`Using config "${config.configPath}"`));
+    argv['delete-all'] || argv.configureEsvu || argv.configureJsvu) {
+  const message = `Using config "${config.configPath}"`;
+  console.log(
+    argv.noColors ? message : chalk.grey(message)
+  );
 }
 // list available hosts
 if (argv.list) {
@@ -265,8 +285,8 @@ if (argv['delete-all']) {
   process.exit(0);
 }
 
-if (argv['configure-esvu'] || argv['configure-jsvu']) {
-  const vu = argv['configure-esvu']
+if (argv.configureEsvu || argv.configureJsvu) {
+  const vu = argv.configureEsvu
     ? 'esvu'
     : 'jsvu';
   const vuRoot = path.join(argv[`${vu}-root`] || os.homedir(), `.${vu}`);
@@ -372,7 +392,10 @@ async function runInHost(testable, host) {
     reporter.result(host, result);
     return runner.destroy();
   }).catch(e => {
-    console.error(chalk.red(`Failure attempting to eval script in agent: ${e.stack}`));
+    const message = `Failure attempting to eval script in agent: ${e.stack}`;
+    console.error(
+      argv.noColors ? message : chalk.red(message)
+    );
   });
 }
 
