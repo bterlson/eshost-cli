@@ -1,6 +1,6 @@
 {
   "name": "eshost-cli",
-  "version": "7.6.2",
+  "version": "7.6.3",
   "description": "Run scripts in any ECMAScript host",
   "bin": {
     "eshost": "bin/eshost.js"
