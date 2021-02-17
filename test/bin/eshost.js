@@ -499,6 +499,48 @@ describe('eshost [input-file]', () => {
     });
   });
 
+  describe('absolute path to script.js', () => {
+    it('evaluates code and displays the result for all hosts', () => {
+      return eshost(`${__dirname}/fixtures/script.js`).then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### node/m.test(result.stdout));
+        assert(/#### engine262/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for a specific host', () => {
+      return eshost(`--host engine262 ${__dirname}/fixtures/script.js`).then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### engine262\ntrue/m.test(result.stdout));
+        assert(!/#### node\ntrue\n\n/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for a specific host group', () => {
+      return eshost(`--hostGroup engine262 ${__dirname}/fixtures/script.js`).then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### engine262\ntrue/m.test(result.stdout));
+        assert(!/#### node\ntrue\n\n/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for a specific tag', () => {
+      return eshost(`--tags latest ${__dirname}/fixtures/script.js`).then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### engine262\ntrue/m.test(result.stdout));
+        assert(!/#### node\ntrue\n\n/m.test(result.stdout));
+      });
+    });
+
+    it('evaluates code and displays the result for specific tags', () => {
+      return eshost(`--tags latest,greatest ${__dirname}/fixtures/script.js`).then(result => {
+        assert.equal(result.stderr, '');
+        assert(/#### engine262\ntrue/m.test(result.stdout));
+        assert(!/#### node\ntrue\n\n/m.test(result.stdout));
+      });
+    });
+  });
+
   describe('module.mjs', () => {
     it('evaluates code and displays the result for all hosts', () => {
       return eshost('test/bin/fixtures/module.mjs').then(result => {

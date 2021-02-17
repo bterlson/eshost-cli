@@ -307,7 +307,11 @@ const attrs = {
 process.stdin.setEncoding('utf8');
 
 if (fileArg) {
-  const file = path.join(process.cwd(), fileArg);
+  const fileArgJoinPath = !path.isAbsolute(fileArg)
+    ? process.cwd()
+    : '';
+
+  const file = path.join(fileArgJoinPath, fileArg);
   const contents = fs.readFileSync(file, 'utf8');
   const attrs = {
     flags: {
