@@ -336,7 +336,7 @@ if (fileArg) {
     }
   }
 
-  if (argv.e) {
+  if (argv.e != null) {
     let contents = `print(${argv.e})`;
     fs.writeFileSync(file, contents);
     runInEachHost({file, contents, attrs}, hosts);
