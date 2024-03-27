@@ -113,14 +113,14 @@ npm install
 npm run build
 npm link
 set NPM_GLOBAL_MODULE_PATH=%APPDATA%\npm\
-set PATH=%PATH;%NPM_GLOBAL_MODULE_PATH%
+set PATH=%PATH%;%NPM_GLOBAL_MODULE_PATH%
 where engine262
 
 npm install jsvu
 
 jsvu --os=win64 --engines="chakra,spidermonkey,v8,xs"
 
-set PATH=%PATH;%USERPROFILE%\.jsvu\
+set PATH=%PATH%;%USERPROFILE%\.jsvu\
 set ESHOST_CHAKRA=%USERPROFILE%\.jsvu\chakra.cmd
 set ESHOST_ENGINE262=%NPM_GLOBAL_MODULE_PATH%\engine262.cmd
 set ESHOST_SPIDERMONKEY=%USERPROFILE%\.jsvu\spidermonkey.cmd
