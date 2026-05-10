@@ -43,6 +43,7 @@ export ESHOST_PATH_QUICKJS=`which qjs-for-eshost`;
 export ESHOST_PATH_SPIDERMONKEY=`which spidermonkey`;
 export ESHOST_PATH_V8=`which v8`;
 export ESHOST_PATH_XS=`which xs`;
+export ESHOST_PATH_LIBJS=`which serenity-js`;
 
 npm install -g eshost-cli;
 
@@ -50,6 +51,7 @@ eshost --add "chakra" ch $ESHOST_PATH_CHAKRA;
 eshost --add "engine262" engine262 $ESHOST_PATH_ENGINE262;
 eshost --add "hermes" hermes $ESHOST_PATH_HERMES;
 eshost --add "javascriptcore" jsc $ESHOST_PATH_JAVASCRIPTCORE;
+eshost --add "libjs" serenity-js $ESHOST_PATH_LIBJS;
 eshost --add "quickjs" qjs $ESHOST_PATH_QUICKJS;
 eshost --add "spidermonkey" jsshell $ESHOST_PATH_SPIDERMONKEY;
 eshost --add "v8" d8 $ESHOST_PATH_V8;
@@ -268,6 +270,7 @@ Host types are [those provided by eshost](https://github.com/bterlson/eshost#esh
 | Nashorn | `nashorn` |
 | Node | `node` |
 | QuickJS | `qjs` <sup>1</sup> |
+| Serenity LibJS | `serenity-js`, `libjs` |
 | SpiderMonkey | `jsshell`, `spidermonkey`, `sm` |
 | V8 | `d8`, `v8` |
 | XS | `xs` |
